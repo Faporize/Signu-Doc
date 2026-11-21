@@ -31,6 +31,7 @@ import {
   DOCUMENT_ZOOM_STEP,
 } from "@/components/shared/document-viewport";
 import { FieldShell, ShellButton } from "@/components/shared/form-shell";
+import { FitBox, FitText } from "@/components/shared/fit-text";
 import {
   Dialog,
   DialogContent,
@@ -1738,21 +1739,15 @@ function CurrentSignerField({
               />
             </span>
           ) : signatureEntry?.value && showInlineValue ? (
-            <span
-              className="block max-w-full truncate px-1 text-sm"
-              style={{
-                fontFamily:
-                  signatureEntry.inputMethod === "typed"
-                    ? typedSignatureFont
-                    : undefined,
-                fontSize:
-                  signatureEntry.inputMethod === "typed"
-                    ? "1.05rem"
-                    : undefined,
-              }}
-            >
-              {signatureEntry.value}
-            </span>
+            <FitText
+              fontFamily={
+                signatureEntry.inputMethod === "typed"
+                  ? typedSignatureFont
+                  : undefined
+              }
+              heightRatio={signatureEntry.inputMethod === "typed" ? 0.9 : 0.64}
+              text={signatureEntry.value}
+            />
           ) : showInlineLabel ? (
             <span className="block max-w-full truncate px-1 text-xs font-bold">
               {getCanvasFieldLabel(field)}
@@ -1772,9 +1767,12 @@ function CurrentSignerField({
         style={frame}
       >
         {showInlineValue ? (
-          <p className="flex h-full items-center truncate px-2 text-[12px] font-semibold">
-            {field.type === "date" ? localDateLabel : signerName}
-          </p>
+          <FitText
+            align="start"
+            fontWeight={600}
+            paddingX={8}
+            text={field.type === "date" ? localDateLabel : signerName}
+          />
         ) : null}
       </div>
     );
@@ -1802,27 +1800,31 @@ function CurrentSignerField({
     }
 
     return (
-      <div
+      <FitBox
         className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
           tooLongMessage
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
         }`}
-        data-signing-field="true"
+        options={{ paddingX: 8 }}
         style={frame}
+        text={textValue || (showInlineLabel ? getFieldLabel(field) : "")}
         title={tooLongMessage ?? undefined}
       >
-        <input
-          aria-invalid={tooLongMessage ? true : undefined}
-          aria-label={getFieldLabel(field)}
-          className="h-full w-full border-none bg-transparent px-2 text-sm text-(--fg) outline-none placeholder:text-(--placeholder)"
-          id={`signing-field-${field.id}`}
-          name={`signing-field-${field.id}`}
-          onChange={(event) => onTextChange(event.target.value)}
-          placeholder={showInlineLabel ? getFieldLabel(field) : ""}
-          value={textValue}
-        />
-      </div>
+        {(fontSize) => (
+          <input
+            aria-invalid={tooLongMessage ? true : undefined}
+            aria-label={getFieldLabel(field)}
+            className="h-full w-full border-none bg-transparent px-2 text-sm text-(--fg) outline-none placeholder:text-(--placeholder)"
+            id={`signing-field-${field.id}`}
+            name={`signing-field-${field.id}`}
+            onChange={(event) => onTextChange(event.target.value)}
+            placeholder={showInlineLabel ? getFieldLabel(field) : ""}
+            style={fontSize ? { fontSize } : undefined}
+            value={textValue}
+          />
+        )}
+      </FitBox>
     );
   }
 
@@ -1848,29 +1850,33 @@ function CurrentSignerField({
     }
 
     return (
-      <div
+      <FitBox
         className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
           isInvalid
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
         }`}
-        data-signing-field="true"
+        options={{ paddingX: 8 }}
         style={frame}
+        text={textValue || (showInlineLabel ? "Number" : "")}
         title={isInvalid ? NUMBER_ENTRY_MESSAGE : undefined}
       >
-        <input
-          aria-invalid={isInvalid ? true : undefined}
-          aria-label={getFieldLabel(field)}
-          autoComplete="off"
-          className="h-full w-full border-none bg-transparent px-2 text-sm text-(--fg) outline-none placeholder:text-(--placeholder)"
-          id={`signing-field-${field.id}`}
-          inputMode="decimal"
-          name={`signing-field-${field.id}`}
-          onChange={(event) => onTextChange(event.target.value)}
-          placeholder={showInlineLabel ? "Number" : ""}
-          value={textValue}
-        />
-      </div>
+        {(fontSize) => (
+          <input
+            aria-invalid={isInvalid ? true : undefined}
+            aria-label={getFieldLabel(field)}
+            autoComplete="off"
+            className="h-full w-full border-none bg-transparent px-2 text-sm text-(--fg) outline-none placeholder:text-(--placeholder)"
+            id={`signing-field-${field.id}`}
+            inputMode="decimal"
+            name={`signing-field-${field.id}`}
+            onChange={(event) => onTextChange(event.target.value)}
+            placeholder={showInlineLabel ? "Number" : ""}
+            style={fontSize ? { fontSize } : undefined}
+            value={textValue}
+          />
+        )}
+      </FitBox>
     );
   }
 
@@ -1893,31 +1899,36 @@ function CurrentSignerField({
     }
 
     return (
-      <div
+      <FitBox
         className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:bg-white"
-        data-signing-field="true"
+        // Room for the arrow on the right and the left padding of the select.
+        options={{ paddingX: 14 }}
         style={frame}
+        text={textValue || (field.required ? "Choose one" : "No answer")}
       >
-        <select
-          aria-label={getFieldLabel(field)}
-          className={`h-full w-full cursor-pointer border-none bg-transparent bg-size-[0.75rem] bg-position-[right_0.25rem_center] pr-5 pl-1.5 text-sm outline-none ${
-            textValue ? "text-(--fg)" : "text-(--secondary)"
-          }`}
-          id={`signing-field-${field.id}`}
-          name={`signing-field-${field.id}`}
-          onChange={(event) => onTextChange(event.target.value)}
-          value={textValue}
-        >
-          <option value="">
-            {field.required ? "Choose one" : "No answer"}
-          </option>
-          {(field.options ?? []).map((option) => (
-            <option key={option} value={option}>
-              {option}
+        {(fontSize) => (
+          <select
+            aria-label={getFieldLabel(field)}
+            className={`h-full w-full cursor-pointer border-none bg-transparent bg-size-[0.75rem] bg-position-[right_0.25rem_center] pr-5 pl-1.5 text-sm outline-none ${
+              textValue ? "text-(--fg)" : "text-(--secondary)"
+            }`}
+            id={`signing-field-${field.id}`}
+            name={`signing-field-${field.id}`}
+            onChange={(event) => onTextChange(event.target.value)}
+            style={fontSize ? { fontSize } : undefined}
+            value={textValue}
+          >
+            <option value="">
+              {field.required ? "Choose one" : "No answer"}
             </option>
-          ))}
-        </select>
-      </div>
+            {(field.options ?? []).map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        )}
+      </FitBox>
     );
   }
 
@@ -2061,25 +2072,23 @@ function VisibleFieldStamp({ field }: { field: SigningVisibleField }) {
     >
       <div className="flex h-full w-full items-center overflow-hidden px-1">
         {showInlineValue ? (
-          <p
-            className={`truncate ${
-              showInlineLabel ? "text-[12px]" : "w-full text-center text-[11px]"
-            } font-medium`}
-            style={{
-              fontFamily:
-                field.inputMethod === "typed" &&
-                (field.type === "signature" || field.type === "initials")
-                  ? typedSignatureFont
-                  : undefined,
-              fontSize:
-                field.inputMethod === "typed" &&
-                (field.type === "signature" || field.type === "initials")
-                  ? "1rem"
-                  : undefined,
-            }}
-          >
-            {getVisibleFieldValue(field)}
-          </p>
+          <FitText
+            align={showInlineLabel ? "start" : "center"}
+            className="font-medium"
+            fontFamily={
+              field.inputMethod === "typed" &&
+              (field.type === "signature" || field.type === "initials")
+                ? typedSignatureFont
+                : undefined
+            }
+            heightRatio={
+              field.inputMethod === "typed" &&
+              (field.type === "signature" || field.type === "initials")
+                ? 0.9
+                : 0.64
+            }
+            text={getVisibleFieldValue(field)}
+          />
         ) : showInlineLabel ? (
           <p className="w-full truncate text-center text-[11px] font-semibold text-(--tertiary)">
             {getCanvasFieldLabel(field)}

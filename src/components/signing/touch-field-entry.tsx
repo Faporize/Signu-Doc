@@ -2,6 +2,7 @@
 
 import { type CSSProperties, useState, useSyncExternalStore } from "react";
 
+import { FitText } from "@/components/shared/fit-text";
 import { ShellButton } from "@/components/shared/form-shell";
 import {
   Dialog,
@@ -81,13 +82,12 @@ export function TouchFieldEntry({
         style={frame}
         type="button"
       >
-        <span
-          className={`block truncate px-2 text-sm ${
-            shown ? "text-(--fg)" : "text-(--placeholder)"
-          }`}
-        >
-          {shown || placeholder}
-        </span>
+        <FitText
+          align="start"
+          className={shown ? "text-(--fg)" : "text-(--placeholder)"}
+          paddingX={8}
+          text={shown || placeholder}
+        />
       </button>
 
       <Dialog onOpenChange={setOpen} open={open}>
