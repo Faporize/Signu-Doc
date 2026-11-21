@@ -155,7 +155,9 @@ export function TouchFieldEntry({
                 onChange={(event) => onChange(event.target.value)}
                 value={value}
               >
-                <option value="">{required ? "Choose one" : "No answer"}</option>
+                <option value="">
+                  {required ? "Choose one" : "No answer"}
+                </option>
                 {options.map((option) => (
                   <option key={option} value={option}>
                     {option}

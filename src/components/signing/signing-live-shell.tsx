@@ -47,6 +47,11 @@ import {
 } from "@/lib/field-choices";
 import { getInitials } from "@/lib/initials";
 import {
+  chooseSignatureDateLayout,
+  SIGNATURE_DATE_BELOW_SHARE,
+  SIGNATURE_DATE_BESIDE_SHARE,
+} from "@/lib/signature-date-layout";
+import {
   sortInReadingOrder,
   startStep,
   stepAfter,
@@ -1099,72 +1104,89 @@ export function SigningLiveShell({
                   pageNumber={activePage}
                 />
 
-                      {isDocumentReady
-                        ? pageVisibleFields.map((field) => (
-                            <VisibleFieldStamp field={field} key={field.id} />
-                          ))
-                        : null}
+                {isDocumentReady
+                  ? pageVisibleFields.map((field) => (
+                      <VisibleFieldStamp field={field} key={field.id} />
+                    ))
+                  : null}
 
-                      {isDocumentReady
-                        ? pageCurrentFields.map((field) => (
-                            <CurrentSignerField
-                              checkboxValue={Boolean(checkboxValues[field.id])}
-                              field={field}
-                              key={field.id}
-                              localDateLabel={localDateLabel}
-                              isInvalid={isInvalidEntry(field)}
-                              tooLongMessage={
-                                tooLongAnswers[field.id] !== undefined
-                                  ? describeTooLongAnswer(
-                                      tooLongAnswers[field.id]!,
-                                    )
-                                  : null
+                {isDocumentReady
+                  ? pageCurrentFields.map((field) => (
+                      <CurrentSignerField
+                        checkboxValue={Boolean(checkboxValues[field.id])}
+                        field={field}
+                        key={field.id}
+                        dateOnSignature={
+                          record.currentSignerFields.some(
+                            (other) =>
+                              other.type === "date" &&
+                              other.page === field.page,
+                          )
+                            ? null
+                            : localDateLabel
+                        }
+                        localDateLabel={localDateLabel}
+                        pageSizePt={
+                          activePageRecord
+                            ? {
+                                heightPt: activePageRecord.heightPt,
+                                widthPt: activePageRecord.widthPt,
                               }
-                              signerName={record.signer.name}
-                              onCheckboxChange={(checked) => {
-                                setSubmitError(null);
-                                setCheckboxValues((current) => {
-                                  const next = {
-                                    ...current,
-                                    [field.id]: checked,
-                                  };
+                            : undefined
+                        }
+                        isInvalid={isInvalidEntry(field)}
+                        tooLongMessage={
+                          tooLongAnswers[field.id] !== undefined
+                            ? describeTooLongAnswer(tooLongAnswers[field.id]!)
+                            : null
+                        }
+                        signerName={record.signer.name}
+                        onCheckboxChange={(checked) => {
+                          setSubmitError(null);
+                          setCheckboxValues((current) => {
+                            const next = {
+                              ...current,
+                              [field.id]: checked,
+                            };
 
-                                  // Choosing one radio button lets go of
-                                  // the others in its group.
-                                  if (field.type === "radio" && checked) {
-                                    for (const button of getRadioGroup(
-                                      field,
-                                      record.currentSignerFields,
-                                    )) {
-                                      if (button.id !== field.id) {
-                                        next[button.id] = false;
-                                      }
-                                    }
-                                  }
-
-                                  return next;
-                                });
-                              }}
-                              onSignatureClick={() =>
-                                handleSignatureFieldClick(field)
+                            // Choosing one radio button lets go of
+                            // the others in its group.
+                            if (field.type === "radio" && checked) {
+                              for (const button of getRadioGroup(
+                                field,
+                                record.currentSignerFields,
+                              )) {
+                                if (button.id !== field.id) {
+                                  next[button.id] = false;
+                                }
                               }
-                              onTextChange={(value) => {
-                                setSubmitError(null);
-                                setTextValues((current) => ({
-                                  ...current,
-                                  [field.id]: value,
-                                }));
-                              }}
-                              activation={activation}
-                              onActivationHandled={markGuideConsumed}
-                              onConfirm={advanceSoon}
-                              signatureEntry={signatureValues[field.id]}
-                              textValue={textValues[field.id] ?? ""}
-                            />
-                          ))
-                        : null}
+                            }
 
-                {isDocumentReady && guideStep && guideStep.page === activePage ? (
+                            return next;
+                          });
+                        }}
+                        onSignatureClick={() =>
+                          handleSignatureFieldClick(field)
+                        }
+                        onTextChange={(value) => {
+                          setSubmitError(null);
+                          setTextValues((current) => ({
+                            ...current,
+                            [field.id]: value,
+                          }));
+                        }}
+                        activation={activation}
+                        onActivationHandled={markGuideConsumed}
+                        onConfirm={advanceSoon}
+                        signatureEntry={signatureValues[field.id]}
+                        textValue={textValues[field.id] ?? ""}
+                      />
+                    ))
+                  : null}
+
+                {isDocumentReady &&
+                guideStep &&
+                guideStep.page === activePage ? (
                   <div
                     aria-hidden="true"
                     className="pointer-events-none absolute z-3 animate-pulse rounded-md ring-4 ring-[rgb(var(--accent-rgb)/0.55)]"
@@ -1502,6 +1524,7 @@ export function SigningLiveShell({
 function CurrentSignerField({
   activation = null,
   checkboxValue,
+  dateOnSignature = null,
   field,
   isInvalid,
   localDateLabel,
@@ -1510,6 +1533,7 @@ function CurrentSignerField({
   onConfirm,
   onSignatureClick,
   onTextChange,
+  pageSizePt,
   signatureEntry,
   signerName,
   textValue,
@@ -1518,6 +1542,11 @@ function CurrentSignerField({
   /** Set when a guided step asks this field to open or take focus. */
   activation?: { fieldId: string; nonce: number } | null;
   checkboxValue: boolean;
+  /**
+   * The day to show with a signature, beside or under it, once it is signed.
+   * Null when the signer has a date field of their own on the page.
+   */
+  dateOnSignature?: string | null;
   field: SigningCurrentField;
   /** True for a number field holding something that is not a number. */
   isInvalid: boolean;
@@ -1528,6 +1557,8 @@ function CurrentSignerField({
   onConfirm?: () => void;
   onSignatureClick: () => void;
   onTextChange: (value: string) => void;
+  /** The size of the page the field is on, in points. */
+  pageSizePt?: { heightPt: number; widthPt: number };
   signatureEntry?: SignatureEntry;
   /** What a name field shows: the name the sender gave this signer. */
   signerName: string;
@@ -1576,6 +1607,19 @@ function CurrentSignerField({
   }, [activation?.nonce, isActivated, touchEntry]);
 
   if (field.type === "signature" || field.type === "initials") {
+    // Once signed, the day sits beside the signature or under it when the box
+    // has room, as in the signed document.
+    const dateLayout =
+      field.type === "signature" &&
+      signatureEntry?.value &&
+      dateOnSignature &&
+      pageSizePt
+        ? chooseSignatureDateLayout({
+            heightPt: field.height * pageSizePt.heightPt,
+            widthPt: field.width * pageSizePt.widthPt,
+          })
+        : null;
+
     return (
       <button
         aria-label={getSummaryLabel(field)}
@@ -1589,31 +1633,64 @@ function CurrentSignerField({
         style={frame}
         type="button"
       >
-        <span className="pointer-events-none flex h-full w-full items-center justify-center overflow-hidden px-1 text-center">
-          {signatureEntry?.inputMethod === "drawn" &&
-          signatureEntry.imageDataUrl ? (
-            <span className="relative block h-full w-full">
-              <Image
-                alt={`${field.type === "initials" ? "Initials" : "Signature"} preview`}
-                className="object-contain p-1"
-                fill
-                src={signatureEntry.imageDataUrl}
-                unoptimized
+        <span
+          className={`pointer-events-none flex h-full w-full overflow-hidden ${
+            dateLayout === "beside"
+              ? "flex-row"
+              : dateLayout === "below"
+                ? "flex-col"
+                : ""
+          }`}
+        >
+          <span
+            className={`flex items-center justify-center overflow-hidden px-1 text-center ${
+              dateLayout ? "min-h-0 min-w-0 flex-1" : "h-full w-full"
+            }`}
+          >
+            {signatureEntry?.inputMethod === "drawn" &&
+            signatureEntry.imageDataUrl ? (
+              <span className="relative block h-full w-full">
+                <Image
+                  alt={`${field.type === "initials" ? "Initials" : "Signature"} preview`}
+                  className="object-contain p-1"
+                  fill
+                  src={signatureEntry.imageDataUrl}
+                  unoptimized
+                />
+              </span>
+            ) : signatureEntry?.value && showInlineValue ? (
+              <FitText
+                fontFamily={
+                  signatureEntry.inputMethod === "typed"
+                    ? typedSignatureFont
+                    : undefined
+                }
+                heightRatio={
+                  signatureEntry.inputMethod === "typed" ? 0.9 : 0.64
+                }
+                text={signatureEntry.value}
               />
-            </span>
-          ) : signatureEntry?.value && showInlineValue ? (
-            <FitText
-              fontFamily={
-                signatureEntry.inputMethod === "typed"
-                  ? typedSignatureFont
-                  : undefined
+            ) : showInlineLabel ? (
+              <span className="block max-w-full truncate px-1 text-xs font-bold">
+                {getCanvasFieldLabel(field)}
+              </span>
+            ) : null}
+          </span>
+          {dateLayout && dateOnSignature ? (
+            <span
+              className="shrink-0 overflow-hidden text-(--secondary)"
+              style={
+                dateLayout === "below"
+                  ? { height: `${SIGNATURE_DATE_BELOW_SHARE * 100}%` }
+                  : { width: `${SIGNATURE_DATE_BESIDE_SHARE * 100}%` }
               }
-              heightRatio={signatureEntry.inputMethod === "typed" ? 0.9 : 0.64}
-              text={signatureEntry.value}
-            />
-          ) : showInlineLabel ? (
-            <span className="block max-w-full truncate px-1 text-xs font-bold">
-              {getCanvasFieldLabel(field)}
+            >
+              <FitText
+                fontWeight={500}
+                heightRatio={0.7}
+                maxPx={12}
+                text={dateOnSignature}
+              />
             </span>
           ) : null}
         </span>

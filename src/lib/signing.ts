@@ -129,6 +129,7 @@ import {
   routeAfterSignatures,
   signingStepOf,
 } from "./signing-steps.ts";
+import { formatLocalSigningDate } from "./local-signing-date.ts";
 
 export type SigningRequestMeta = {
   ipAddress?: string | null;
@@ -903,22 +904,6 @@ async function buildImageDataUrl(
   const imageObject = await storageService.getObject(imageKey);
 
   return `data:${imageObject.contentType ?? "image/png"};base64,${Buffer.from(imageObject.body).toString("base64")}`;
-}
-
-function formatLocalSigningDate(
-  submittedAt: number,
-  timezoneOffsetMinutes: number,
-): string {
-  const localDateTime = new Date(
-    submittedAt * 1000 - timezoneOffsetMinutes * 60 * 1000,
-  );
-
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-    year: "numeric",
-  }).format(localDateTime);
 }
 
 function parsePngDataUrl(dataUrl: string): Uint8Array {
