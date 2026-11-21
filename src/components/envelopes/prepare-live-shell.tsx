@@ -410,7 +410,7 @@ function PrepareLiveShellError({ envelopeId }: { envelopeId: string }) {
       stepLabel="Step 3 of 4"
       title='"Document"'
     >
-      <div className="flex min-h-[calc(100vh-73px)] items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="flex min-h-[calc(100dvh-73px)] items-center justify-center p-4 sm:p-6 lg:p-8">
         <section className="panel w-full max-w-[520px] p-8 text-center sm:p-10">
           <div className="mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-(--danger-soft) text-lg font-extrabold text-(--danger)">
             !
@@ -914,9 +914,9 @@ function PrepareLiveShellContent({
       stepLabel="Step 3 of 4"
       title={`"${record.title}"`}
     >
-      <div className="grid min-h-[calc(100vh-73px)] lg:grid-cols-[272px_minmax(0,1fr)_304px]">
+      <div className="grid min-h-[calc(100dvh-73px)] lg:grid-cols-[272px_minmax(0,1fr)_304px]">
         <aside className="hidden lg:block">
-          <div className="sticky top-[4.5rem] flex max-h-[calc(100vh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pl-5">
+          <div className="sticky top-[4.5rem] flex max-h-[calc(100dvh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pl-5">
             <section className="panel space-y-3 rounded-[1.25rem] p-4">
               <p className="section-eyebrow px-1">Fields</p>
               <div className="grid gap-2">
@@ -1251,7 +1251,7 @@ function PrepareLiveShellContent({
         </section>
 
         <aside className="hidden lg:block">
-          <div className="sticky top-[4.5rem] flex max-h-[calc(100vh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pr-5">
+          <div className="sticky top-[4.5rem] flex max-h-[calc(100dvh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pr-5">
             <section className="panel space-y-3 rounded-[1.25rem] p-4">
               <p className="section-eyebrow px-1">Inspector</p>
               <div>

@@ -117,6 +117,7 @@
   body {
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--page);
     color: var(--fg);
     font-family:
@@ -319,8 +320,10 @@
       box-shadow 120ms ease;
   }
 
-  .segmented-item:hover {
-    color: var(--fg);
+  @media (hover: hover) and (pointer: fine) {
+    .segmented-item:hover {
+      color: var(--fg);
+    }
   }
 
   .segmented-item[aria-pressed="true"],
@@ -358,8 +361,10 @@
     text-overflow: ellipsis;
   }
 
-  .field-input:hover {
-    border-color: var(--border-hover);
+  @media (hover: hover) and (pointer: fine) {
+    .field-input:hover {
+      border-color: var(--border-hover);
+    }
   }
 
   .field-input:focus-visible {
@@ -400,10 +405,12 @@
       color 120ms ease;
   }
 
-  .btn-quiet:hover:not(:disabled) {
-    border-color: var(--accent);
-    background: var(--accent-softer);
-    color: var(--accent-ink);
+  @media (hover: hover) and (pointer: fine) {
+    .btn-quiet:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--accent-softer);
+      color: var(--accent-ink);
+    }
   }
 
   .btn-quiet:disabled,
@@ -412,10 +419,12 @@
     opacity: 0.45;
   }
 
-  .btn-quiet-danger:hover:not(:disabled) {
-    border-color: var(--danger);
-    background: var(--danger-soft);
-    color: var(--danger);
+  @media (hover: hover) and (pointer: fine) {
+    .btn-quiet-danger:hover:not(:disabled) {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
   }
 
   /* A message in a tinted box: something failed, or needs attention. */
@@ -456,5 +465,54 @@
     );
     background-position: center center;
     background-size: 22px 22px;
+  }
+}
+
+/*
+ * Phone behavior. These sit outside the layers on purpose: unlayered rules win
+ * over Tailwind utilities such as text-sm, which a plain input would otherwise
+ * keep.
+ */
+html {
+  /* No grey flash over whatever was tapped; buttons show their own :active. */
+  -webkit-tap-highlight-color: transparent;
+  /* No font inflation when a phone is turned sideways. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* No pull-to-refresh or rubber-band while drawing or dragging on the page. */
+  overscroll-behavior-y: none;
+}
+
+/* A tap fires at once instead of waiting to see whether it is a double-tap. */
+a,
+button,
+summary,
+label,
+[role="button"],
+[role="checkbox"],
+[role="radio"],
+[role="tab"] {
+  touch-action: manipulation;
+}
+
+/* Controls are not text to select: a long press on a button should not
+   highlight its label or open the copy callout. Content stays selectable. */
+button,
+[role="button"],
+[role="checkbox"],
+[role="radio"],
+[role="tab"] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iPhone Safari zooms the whole page into any field set below 16px and does
+   not zoom back out. Touch screens get 16px; mouse screens keep the design. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
   }
 }

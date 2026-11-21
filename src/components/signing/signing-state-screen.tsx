@@ -30,7 +30,7 @@ export function SigningStateScreen({
   }, [focusHeading]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-dvh flex-col">
       <header>
         <div className="page-width flex items-center py-4">
           <Brand href="/" />
