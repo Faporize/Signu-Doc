@@ -49,7 +49,6 @@ import { getInitials } from "@/lib/initials";
 import {
   chooseSignatureDateLayout,
   SIGNATURE_DATE_BELOW_SHARE,
-  SIGNATURE_DATE_BESIDE_SHARE,
 } from "@/lib/signature-date-layout";
 import {
   sortInReadingOrder,
@@ -1543,7 +1542,7 @@ function CurrentSignerField({
   activation?: { fieldId: string; nonce: number } | null;
   checkboxValue: boolean;
   /**
-   * The day to show with a signature, beside or under it, once it is signed.
+   * The day to show under a signature once it is signed.
    * Null when the signer has a date field of their own on the page.
    */
   dateOnSignature?: string | null;
@@ -1607,8 +1606,8 @@ function CurrentSignerField({
   }, [activation?.nonce, isActivated, touchEntry]);
 
   if (field.type === "signature" || field.type === "initials") {
-    // Once signed, the day sits beside the signature or under it when the box
-    // has room, as in the signed document.
+    // Once signed, the day sits under the signature when the box has room, as
+    // in the signed document.
     const dateLayout =
       field.type === "signature" &&
       signatureEntry?.value &&
@@ -1635,11 +1634,7 @@ function CurrentSignerField({
       >
         <span
           className={`pointer-events-none flex h-full w-full overflow-hidden ${
-            dateLayout === "beside"
-              ? "flex-row"
-              : dateLayout === "below"
-                ? "flex-col"
-                : ""
+            dateLayout ? "flex-col" : ""
           }`}
         >
           <span
@@ -1679,11 +1674,7 @@ function CurrentSignerField({
           {dateLayout && dateOnSignature ? (
             <span
               className="shrink-0 overflow-hidden text-(--secondary)"
-              style={
-                dateLayout === "below"
-                  ? { height: `${SIGNATURE_DATE_BELOW_SHARE * 100}%` }
-                  : { width: `${SIGNATURE_DATE_BESIDE_SHARE * 100}%` }
-              }
+              style={{ height: `${SIGNATURE_DATE_BELOW_SHARE * 100}%` }}
             >
               <FitText
                 fontWeight={500}

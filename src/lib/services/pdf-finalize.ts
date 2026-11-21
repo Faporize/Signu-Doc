@@ -717,8 +717,7 @@ export async function stampFieldValue(
 /** What a caller may ask a stamp to add. */
 export type StampOptions = {
   /**
-   * The day the signer signed, written inside a signature's box beside or
-   * under it. Left out, the signature is drawn alone.
+   * The day the signer signed, written inside a signature's box, under it. Left out, the signature is drawn alone.
    */
   signatureDate?: string | null;
 };
@@ -768,8 +767,8 @@ async function drawFieldValue(
   switch (field.type) {
     case "signature":
     case "initials": {
-      // A signature carries the day it was signed, beside it or under it
-      // when the box has room, so the sender need not place a date field.
+      // A signature carries the day it was signed, under it when the box
+      // has room, so the sender need not place a date field.
       const wholeBox: SignatureBox = {
         height: rect.heightPt,
         width: rect.widthPt,
@@ -779,7 +778,7 @@ async function drawFieldValue(
       const dateLayout = options.signatureDate
         ? chooseSignatureDateLayout(rect)
         : null;
-      const parts = dateLayout ? splitSignatureBox(wholeBox, dateLayout) : null;
+      const parts = dateLayout ? splitSignatureBox(wholeBox) : null;
       const area = parts?.signature ?? wholeBox;
       const drawDate = () => {
         if (parts && options.signatureDate) {

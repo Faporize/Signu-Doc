@@ -29,14 +29,7 @@ test("no time zone is written next to the date", () => {
   assert.doesNotMatch(label, /UTC|GMT|EST|PST|CST|MST|[+-]\d{2}:?\d{2}/);
 });
 
-test("a wide box puts the date beside the signature", () => {
-  assert.equal(
-    chooseSignatureDateLayout({ heightPt: 30, widthPt: 180 }),
-    "beside",
-  );
-});
-
-test("a box that is not wide puts the date underneath", () => {
+test("a box with room puts the date underneath, however wide it is", () => {
   assert.equal(
     chooseSignatureDateLayout({ heightPt: 55, widthPt: 147 }),
     "below",
@@ -45,30 +38,25 @@ test("a box that is not wide puts the date underneath", () => {
     chooseSignatureDateLayout({ heightPt: 40, widthPt: 100 }),
     "below",
   );
+  assert.equal(
+    chooseSignatureDateLayout({ heightPt: 40, widthPt: 350 }),
+    "below",
+  );
 });
 
-test("a box too small for both gets no date", () => {
-  assert.equal(chooseSignatureDateLayout({ heightPt: 14, widthPt: 90 }), null);
+test("a box too short or too narrow for both gets no date", () => {
+  assert.equal(chooseSignatureDateLayout({ heightPt: 24, widthPt: 300 }), null);
   assert.equal(chooseSignatureDateLayout({ heightPt: 40, widthPt: 40 }), null);
   assert.equal(chooseSignatureDateLayout({ heightPt: 0, widthPt: 0 }), null);
 });
 
 test("the date's part sits under the signature's part and they fill the box", () => {
   const box = { height: 50, width: 150, x: 10, y: 100 };
-  const { date, signature } = splitSignatureBox(box, "below");
+  const { date, signature } = splitSignatureBox(box);
 
   assert.equal(date.y, 100);
   assert.equal(signature.y, date.y + date.height);
   assert.equal(signature.height + date.height, box.height);
   assert.equal(signature.width, box.width);
-});
-
-test("beside, the date takes the right of the box and they fill its width", () => {
-  const box = { height: 30, width: 200, x: 10, y: 100 };
-  const { date, signature } = splitSignatureBox(box, "beside");
-
-  assert.equal(signature.x, box.x);
-  assert.equal(date.x, signature.x + signature.width);
-  assert.equal(signature.width + date.width, box.width);
-  assert.equal(signature.height, box.height);
+  assert.equal(date.width, box.width);
 });
