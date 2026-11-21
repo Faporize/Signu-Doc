@@ -43,6 +43,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { SigningStateScreen } from "@/components/signing/signing-state-screen";
 import {
+  TouchFieldEntry,
+  useTouchEntry,
+} from "@/components/signing/touch-field-entry";
+import {
   type SigningCurrentField,
   type SigningPayload,
   type SigningVisibleField,
@@ -1703,12 +1707,15 @@ function CurrentSignerField({
   const frame = getFieldFrame(field);
   const showInlineLabel = shouldShowInlineFieldLabel(field);
   const showInlineValue = shouldShowInlineFieldValue(field);
+  // On a phone the boxes on the page are too small to type in, so tapping one
+  // opens a full-size sheet instead.
+  const touchEntry = useTouchEntry();
 
   if (field.type === "signature" || field.type === "initials") {
     return (
       <button
         aria-label={getSummaryLabel(field)}
-        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) text-(--accent-ink) transition ${
+        className={`absolute z-2 overflow-hidden pointer-coarse:min-h-11 rounded-[0.375rem] border-2 border-(--accent) text-(--accent-ink) transition ${
           signatureEntry?.value
             ? "bg-[rgb(var(--accent-rgb)/0.10)]"
             : "bg-[rgb(var(--accent-rgb)/0.07)] hover:bg-[rgb(var(--accent-rgb)/0.16)]"
@@ -1774,6 +1781,26 @@ function CurrentSignerField({
   }
 
   if (field.type === "text") {
+    if (touchEntry) {
+      return (
+        <TouchFieldEntry
+          boxClassName={
+            tooLongMessage
+              ? "border-(--danger) bg-(--danger-soft)"
+              : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
+          }
+          error={tooLongMessage}
+          fieldId={field.id}
+          frame={frame}
+          kind="text"
+          label={getFieldLabel(field)}
+          onChange={onTextChange}
+          placeholder={getFieldLabel(field)}
+          value={textValue}
+        />
+      );
+    }
+
     return (
       <div
         className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
@@ -1800,6 +1827,26 @@ function CurrentSignerField({
   }
 
   if (field.type === "number") {
+    if (touchEntry) {
+      return (
+        <TouchFieldEntry
+          boxClassName={
+            isInvalid
+              ? "border-(--danger) bg-(--danger-soft)"
+              : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
+          }
+          error={isInvalid ? NUMBER_ENTRY_MESSAGE : null}
+          fieldId={field.id}
+          frame={frame}
+          kind="number"
+          label={getFieldLabel(field)}
+          onChange={onTextChange}
+          placeholder="Number"
+          value={textValue}
+        />
+      );
+    }
+
     return (
       <div
         className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
@@ -1828,6 +1875,23 @@ function CurrentSignerField({
   }
 
   if (field.type === "dropdown") {
+    if (touchEntry) {
+      return (
+        <TouchFieldEntry
+          boxClassName="border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
+          fieldId={field.id}
+          frame={frame}
+          kind="dropdown"
+          label={getFieldLabel(field)}
+          onChange={onTextChange}
+          options={field.options ?? []}
+          placeholder={field.required ? "Choose one" : "No answer"}
+          required={field.required}
+          value={textValue}
+        />
+      );
+    }
+
     return (
       <div
         className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:bg-white"
@@ -1862,7 +1926,7 @@ function CurrentSignerField({
       <button
         aria-checked={checkboxValue}
         aria-label={getFieldLabel(field)}
-        className={`absolute z-2 flex items-center justify-center rounded-full border-2 border-(--accent) text-(--accent-ink) transition ${
+        className={`absolute z-2 flex pointer-coarse:after:absolute pointer-coarse:after:-inset-4 pointer-coarse:after:content-[''] items-center justify-center rounded-full border-2 border-(--accent) text-(--accent-ink) transition ${
           checkboxValue
             ? "bg-[rgb(var(--accent-rgb)/0.14)]"
             : "bg-white hover:bg-[rgb(var(--accent-rgb)/0.10)]"
@@ -1889,7 +1953,7 @@ function CurrentSignerField({
     <button
       aria-label={getFieldLabel(field)}
       aria-pressed={checkboxValue}
-      className={`absolute z-2 flex items-center justify-center rounded-[0.25rem] border-2 border-(--accent) text-(--accent-ink) transition ${
+      className={`absolute z-2 flex pointer-coarse:after:absolute pointer-coarse:after:-inset-4 pointer-coarse:after:content-[''] items-center justify-center rounded-[0.25rem] border-2 border-(--accent) text-(--accent-ink) transition ${
         checkboxValue
           ? "bg-[rgb(var(--accent-rgb)/0.14)]"
           : "bg-white hover:bg-[rgb(var(--accent-rgb)/0.10)]"
