@@ -1,6 +1,7 @@
 import { type Branding } from "../branding.ts";
 import { formatDeadline } from "../envelope-deadline.ts";
 import { escapeHtml } from "../utils/html.ts";
+import { buildEmailButton } from "./email-button.ts";
 import { withUserEmailLegalFooter } from "./email-legal-footer.ts";
 import { type TransactionalEmailMessage } from "./email.ts";
 
@@ -45,7 +46,11 @@ export function buildSigningInvitationEmail(
   const htmlBody = [
     `<p>Hi ${escapeHtml(input.signerName)},</p>`,
     `<p>${escapeHtml(input.senderName)} sent you &ldquo;${escapeHtml(input.envelopeTitle)}&rdquo; through ${escapeHtml(productName)}.</p>`,
-    `<p><a href="${escapeHtml(input.signingUrl)}">Review and sign the document</a></p>`,
+    buildEmailButton({
+      branding: input.branding,
+      label: "Review and sign",
+      url: input.signingUrl,
+    }),
     deadlineLine ? `<p>${escapeHtml(deadlineLine)}</p>` : "",
     `<p>You do not need a ${escapeHtml(productName)} account to sign.</p>`,
     "<p>If you receive a newer invitation or reminder link, use the newest one.</p>",
