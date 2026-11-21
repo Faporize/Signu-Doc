@@ -244,7 +244,7 @@ export function InteractivePlacedField({
         ? resizeHandles.map((handle) => (
             <button
               aria-label={`Resize ${label} field from ${handle.corner}`}
-              className={`absolute ${handle.positionClassName} ${handle.cursorClassName} z-1 size-4 rounded-full bg-white shadow-[0_4px_10px_rgba(28,29,43,0.18)]`}
+              className={`absolute ${handle.positionClassName} ${handle.cursorClassName} z-1 size-4 touch-none rounded-full bg-white shadow-[0_4px_10px_rgba(28,29,43,0.18)] pointer-coarse:after:absolute pointer-coarse:after:-inset-3 pointer-coarse:after:content-['']`}
               key={handle.corner}
               onPointerCancel={endGesture}
               onPointerDown={(event) =>
