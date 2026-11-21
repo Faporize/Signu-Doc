@@ -157,3 +157,13 @@ test("without the site's address there is nowhere to fetch a logo from", () => {
 
   assert.doesNotMatch(result.htmlBody, /<img/);
 });
+
+test("a message sent by a person ends with their name instead of the software", () => {
+  const result = withUserEmailLegalFooter(body, neutral, env, {
+    sentBy: "Deion Au",
+  });
+
+  assert.match(result.textBody, /\n\nSent by Deion Au$/);
+  assert.ok(!result.textBody.includes("using SignuDoc"));
+  assert.ok(result.htmlBody.endsWith("Sent by Deion Au</p>"));
+});

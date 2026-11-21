@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +19,16 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon.svg",
   },
+};
+
+// The same page color as --page in globals.css, so the phone's status bar and
+// browser chrome blend into the app. resizes-content makes Android shrink the
+// layout when the keyboard opens, as iOS already does.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+  themeColor: "#f3f4f8",
 };
 
 export default function RootLayout({

@@ -8,6 +8,11 @@ type EmailBodyContent = {
   textBody: string;
 };
 
+type FooterOptions = {
+  /** The person who sent this message, for the last line of the footer. */
+  sentBy?: string | null;
+};
+
 type FooterLink = {
   label: string;
   url: string;
@@ -74,6 +79,7 @@ export function withUserEmailLegalFooter(
   input: EmailBodyContent,
   branding: Branding,
   env: EnvSource = process.env,
+  options: FooterOptions = {},
 ): EmailBodyContent {
   const links = buildFooterLinks(branding, env);
   const logoHeader = buildLogoHeader(branding, env);
@@ -93,9 +99,13 @@ export function withUserEmailLegalFooter(
       );
     }
 
-    const sentBy = branding.organizationName
-      ? `Sent by ${branding.organizationName} using ${SIGNUDOC_NAME}.`
-      : `Sent using ${SIGNUDOC_NAME}.`;
+    // A message sent by a person says so in their name; every other email
+    // names the organization and the software.
+    const sentBy = options.sentBy
+      ? `Sent by ${options.sentBy}`
+      : branding.organizationName
+        ? `Sent by ${branding.organizationName} using ${SIGNUDOC_NAME}.`
+        : `Sent using ${SIGNUDOC_NAME}.`;
 
     textLines.push("", sentBy);
     htmlLines.push(escapeHtml(sentBy));

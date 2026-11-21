@@ -26,7 +26,7 @@ export function NotFoundShell({
   const ctaLabel = authenticated ? "Go to Dashboard" : "Go to Home";
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
       <section
         className="panel w-full max-w-[560px] px-6 py-14 text-center sm:px-12 sm:py-16"
         data-animate="enter"

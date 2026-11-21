@@ -31,6 +31,7 @@ import {
 } from "./services/email.ts";
 import { buildDeadlineLine } from "./services/signing-invitation-email.ts";
 import { isEmbeddedEnvelope } from "./embedding.ts";
+import { buildEmailButton } from "./services/email-button.ts";
 import { withUserEmailLegalFooter } from "./services/email-legal-footer.ts";
 import {
   formatReminderAvailableAt,
@@ -264,15 +265,17 @@ function buildReminderEmail(input: {
     input.signingUrl,
     ...(deadlineLine ? ["", deadlineLine] : []),
     "",
-    `You do not need a ${input.branding.productName} account to sign.`,
     "If you receive a newer invitation or reminder link, use the newest one.",
   ].join("\n");
   const htmlBody = [
     `<p>Hi ${escapeHtml(input.signerName)},</p>`,
     `<p>${escapeHtml(introLine)}</p>`,
-    `<p><a href="${escapeHtml(input.signingUrl)}">Review and sign the document</a></p>`,
+    buildEmailButton({
+      branding: input.branding,
+      label: "Review and sign",
+      url: input.signingUrl,
+    }),
     deadlineLine ? `<p>${escapeHtml(deadlineLine)}</p>` : "",
-    `<p>You do not need a ${escapeHtml(input.branding.productName)} account to sign.</p>`,
     "<p>If you receive a newer invitation or reminder link, use the newest one.</p>",
   ].join("");
   const legalFooter = withUserEmailLegalFooter(
@@ -281,6 +284,8 @@ function buildReminderEmail(input: {
       textBody,
     },
     input.branding,
+    undefined,
+    { sentBy: input.senderName },
   );
 
   return {
