@@ -265,7 +265,6 @@ function buildReminderEmail(input: {
     input.signingUrl,
     ...(deadlineLine ? ["", deadlineLine] : []),
     "",
-    `You do not need a ${input.branding.productName} account to sign.`,
     "If you receive a newer invitation or reminder link, use the newest one.",
   ].join("\n");
   const htmlBody = [
@@ -277,7 +276,6 @@ function buildReminderEmail(input: {
       url: input.signingUrl,
     }),
     deadlineLine ? `<p>${escapeHtml(deadlineLine)}</p>` : "",
-    `<p>You do not need a ${escapeHtml(input.branding.productName)} account to sign.</p>`,
     "<p>If you receive a newer invitation or reminder link, use the newest one.</p>",
   ].join("");
   const legalFooter = withUserEmailLegalFooter(

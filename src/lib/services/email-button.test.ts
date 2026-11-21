@@ -68,3 +68,17 @@ test("the invitation email has the button and still carries the plain link", () 
   assert.ok(html.includes("https://sign.acme.com/sign/abc123"));
   assert.ok(message.textBody.includes("https://sign.acme.com/sign/abc123"));
 });
+
+test("the invitation email does not say an account is not needed", () => {
+  const message = buildSigningInvitationEmail({
+    branding,
+    envelopeTitle: "Loan agreement",
+    senderName: "Deion",
+    signerEmail: "jane@example.com",
+    signerName: "Jane",
+    signingUrl: "https://sign.acme.com/sign/abc123",
+  });
+
+  assert.ok(!(message.htmlBody ?? "").includes("account to sign"));
+  assert.ok(!message.textBody.includes("account to sign"));
+});

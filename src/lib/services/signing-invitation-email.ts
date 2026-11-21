@@ -40,7 +40,6 @@ export function buildSigningInvitationEmail(
     input.signingUrl,
     ...(deadlineLine ? ["", deadlineLine] : []),
     "",
-    `You do not need a ${productName} account to sign.`,
     "If you receive a newer invitation or reminder link, use the newest one.",
   ].join("\n");
   const htmlBody = [
@@ -52,7 +51,6 @@ export function buildSigningInvitationEmail(
       url: input.signingUrl,
     }),
     deadlineLine ? `<p>${escapeHtml(deadlineLine)}</p>` : "",
-    `<p>You do not need a ${escapeHtml(productName)} account to sign.</p>`,
     "<p>If you receive a newer invitation or reminder link, use the newest one.</p>",
   ].join("");
   const legalFooter = withUserEmailLegalFooter(
