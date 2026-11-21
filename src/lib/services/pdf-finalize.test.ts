@@ -1167,3 +1167,31 @@ test("a signer who placed their own date field gets no second date", async () =>
   assert.ok(text.includes("March 3, 2027"));
   assert.ok(!text.includes("January 14, 2027"));
 });
+
+test("a Part 11 signature, which already prints its own time, gets no extra date", async () => {
+  const fixture = await makeFixture();
+  const part11Fixture = {
+    ...fixture,
+    envelope: { ...fixture.envelope, part11: true },
+    signers: fixture.signers.map((signer) => ({
+      ...signer,
+      signatureMeaning: "approval" as const,
+    })),
+  };
+  const text = await renderSigned(part11Fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 480),
+  });
+
+  assert.ok(text.includes("Meaning: Approval"));
+  assert.ok(!text.includes("January 14, 2027"));
+});
+
+test("a stored clock value that is not a real offset still gives a signed document", async () => {
+  const fixture = await makeFixture();
+  const text = await renderSigned(fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 1e12),
+  });
+
+  assert.ok(text.includes(SIGNER_NAME));
+  assert.doesNotMatch(text, /January 1[45], 2027/);
+});

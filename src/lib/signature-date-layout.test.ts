@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { formatLocalSigningDate } from "./local-signing-date.ts";
+import {
+  formatLocalSigningDate,
+  formatLocalSigningDateSafely,
+} from "./local-signing-date.ts";
 import {
   chooseSignatureDateLayout,
   splitSignatureBox,
@@ -59,4 +62,33 @@ test("the date's part sits under the signature's part and they fill the box", ()
   assert.equal(signature.height + date.height, box.height);
   assert.equal(signature.width, box.width);
   assert.equal(date.width, box.width);
+});
+
+test("the safe date matches the plain one for a real clock", () => {
+  assert.equal(
+    formatLocalSigningDateSafely(1_800_000_000, 480),
+    formatLocalSigningDate(1_800_000_000, 480),
+  );
+});
+
+test("an odd stored value leaves out the date instead of throwing", () => {
+  for (const [moment, offset] of [
+    [1_800_000_000, undefined],
+    [1_800_000_000, null],
+    [1_800_000_000, "480"],
+    [1_800_000_000, Number.NaN],
+    [1_800_000_000, 481.5],
+    [1_800_000_000, 5000],
+    [1_800_000_000, 1e12],
+    [Number.NaN, 0],
+    [Number.POSITIVE_INFINITY, 0],
+    [1e20, 0],
+    [undefined, 0],
+  ] as const) {
+    assert.equal(
+      formatLocalSigningDateSafely(moment, offset),
+      null,
+      `${String(moment)} / ${String(offset)}`,
+    );
+  }
 });

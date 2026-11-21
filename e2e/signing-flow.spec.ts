@@ -1672,7 +1672,7 @@ test("a long Text answer keeps the signing page within the window", async ({
       signerPage.evaluate(() => document.documentElement.scrollWidth);
 
     await answer.fill("Short");
-    await expect(signerPage.getByText("Short", { exact: true })).toBeVisible();
+    await expect(answer).toHaveValue("Short");
 
     const shortWidth = (await pdfPage.boundingBox())?.width ?? 0;
 
@@ -1681,9 +1681,7 @@ test("a long Text answer keeps the signing page within the window", async ({
     const longAnswer = "W".repeat(230);
 
     await answer.fill(longAnswer);
-    await expect(
-      signerPage.getByText(longAnswer, { exact: true }),
-    ).toBeAttached();
+    await expect(answer).toHaveValue(longAnswer);
     expect(await measure()).toBeLessThanOrEqual(1200);
     expect((await pdfPage.boundingBox())?.width).toBeCloseTo(shortWidth, 0);
     // The whole answer is still there to edit.

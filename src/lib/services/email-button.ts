@@ -25,6 +25,12 @@ export function buildEmailButton({
   const palette =
     (branding.brandColor ? buildBrandPalette(branding.brandColor) : null) ??
     DEFAULT_BRAND_PALETTE;
+  // Only a web link becomes a button. Anything else leaves the plain link in
+  // the text part of the message, which always has it.
+  if (!/^https?:\/\//i.test(url)) {
+    return "";
+  }
+
   const href = escapeHtml(url);
 
   return [
@@ -32,7 +38,7 @@ export function buildEmailButton({
     "<tr>",
     `<td align="center" bgcolor="${palette.accent}" style="border-radius:8px;background-color:${palette.accent};">`,
     `<a href="${href}" target="_blank" rel="noopener noreferrer" `,
-    'style="display:inline-block;padding:14px 28px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;',
+    "style=\"display:inline-block;padding:14px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;",
     'font-size:16px;font-weight:600;line-height:1;color:#ffffff;text-decoration:none;border-radius:8px;">',
     `${escapeHtml(label)}`,
     "</a>",

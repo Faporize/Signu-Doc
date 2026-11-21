@@ -16,6 +16,8 @@ type SigningActionBarProps = {
   onNext: () => void;
   onPrevious: () => void;
   onStart: () => void;
+  /** How many required fields are still unanswered. */
+  remaining: number;
   /** Set once started: the step the signer is on. */
   progress: { current: number; label: string; total: number } | null;
   /** Page controls, for a document with more than one page. */
@@ -44,12 +46,24 @@ export function SigningActionBar({
   onStart,
   pages,
   progress,
+  remaining,
 }: SigningActionBarProps) {
   // Finish takes the main place once nothing is left to do.
   const finishIsPrimary = canFinish || !hasSteps;
+  const status =
+    remaining > 0
+      ? `${remaining} required remaining`
+      : "All required fields complete";
+  const caption = progress
+    ? `${progress.current} of ${progress.total} · ${progress.label} · ${status}`
+    : status;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+    <div
+      aria-label="Signing controls"
+      role="region"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+    >
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-3">
         {alerts.length > 0 ? (
           <div className="grid gap-1" role="alert">
@@ -68,7 +82,7 @@ export function SigningActionBar({
           <div className="flex items-center justify-center gap-2">
             <button
               aria-label="Previous page"
-              className="btn-quiet size-9 px-0"
+              className="btn-quiet size-9 px-0 pointer-coarse:size-11"
               disabled={pages.active === 1}
               onClick={pages.onPrevious}
               type="button"
@@ -80,7 +94,7 @@ export function SigningActionBar({
             </p>
             <button
               aria-label="Next page"
-              className="btn-quiet size-9 px-0"
+              className="btn-quiet size-9 px-0 pointer-coarse:size-11"
               disabled={pages.active === pages.count}
               onClick={pages.onNext}
               type="button"
@@ -90,12 +104,12 @@ export function SigningActionBar({
           </div>
         ) : null}
 
-        {progress ? (
+        {hasSteps || remaining > 0 ? (
           <p
             aria-live="polite"
             className="text-center text-[0.8125rem] font-semibold text-(--secondary)"
           >
-            {`${progress.current} of ${progress.total} · ${progress.label}`}
+            {caption}
           </p>
         ) : null}
 

@@ -56,8 +56,8 @@
   --paper-raised: #ffffff;
   --fg: #1c1d2b;
   --secondary: #575a6e;
-  --tertiary: #6e7183;
-  --placeholder: #8b8ea0;
+  --tertiary: #656879;
+  --placeholder: #6c6f82;
   /*
    * The accent and its shades. An install with its own color replaces all
    * of these together, from a rule the layout adds (see brand-color.ts).

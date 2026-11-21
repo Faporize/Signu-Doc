@@ -1079,6 +1079,7 @@ export function SigningLiveShell({
       </header>
 
       <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col gap-4 pb-44 pt-1 sm:px-6">
+        <h1 className="sr-only">{`Sign ${record.envelopeTitle}`}</h1>
         {signatureProblem && providerSignature ? (
           <div className="notice notice-danger" role="alert">
             {describeProviderProblem(
@@ -1188,7 +1189,7 @@ export function SigningLiveShell({
                 guideStep.page === activePage ? (
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute z-3 animate-pulse rounded-md ring-4 ring-[rgb(var(--accent-rgb)/0.55)]"
+                    className="pointer-events-none absolute z-3 motion-safe:animate-pulse rounded-md ring-4 ring-[rgb(var(--accent-rgb)/0.55)]"
                     data-guide-highlight="true"
                     style={getFieldFrame(guideStep)}
                   />
@@ -1218,6 +1219,7 @@ export function SigningLiveShell({
           }
         }}
         onStart={() => goToStep(startStep(stepAnswered))}
+        remaining={remainingFields}
         pages={
           record.pageCount > 1
             ? {
@@ -1406,7 +1408,12 @@ export function SigningLiveShell({
           onClose={() => undefined}
           title="Before you sign"
         >
-          <div className="well max-h-[45vh] space-y-4 overflow-y-auto px-4 py-4 text-sm leading-6 text-(--secondary) sm:px-5">
+          <div
+            aria-label="Electronic records and signatures disclosure"
+            className="well max-h-[45vh] space-y-4 overflow-y-auto px-4 py-4 text-sm leading-6 text-(--secondary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) sm:px-5"
+            role="region"
+            tabIndex={0}
+          >
             {record.disclosure.sections.map((section, index) => (
               <section key={`${index}-${section.heading}`}>
                 {section.heading ? (
@@ -2115,12 +2122,14 @@ function SignatureModal({
         <TabsList className="segmented flex h-auto w-full p-1 group-data-horizontal/tabs:h-auto">
           <TabsTrigger
             className="segmented-item h-auto min-h-10 flex-1 data-active:bg-white data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
+            aria-controls={undefined}
             value="typed"
           >
             Type
           </TabsTrigger>
           <TabsTrigger
             className="segmented-item h-auto min-h-10 flex-1 data-active:bg-white data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
+            aria-controls={undefined}
             value="drawn"
           >
             Draw
