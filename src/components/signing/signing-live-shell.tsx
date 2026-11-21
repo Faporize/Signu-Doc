@@ -15,21 +15,7 @@ import {
   type PdfPageRenderState,
 } from "@/components/envelopes/pdf-page-canvas";
 import { Brand } from "@/components/layout/brand";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@/components/layout/nav-items";
 import { PublicLegalFooter } from "@/components/layout/public-legal-links";
-import {
-  beginDocumentPanGesture,
-  clampDocumentZoomLevel,
-  DEFAULT_DOCUMENT_ZOOM_LEVEL,
-  DocumentZoomControls,
-  endDocumentPanGesture,
-  moveDocumentPanGesture,
-  type DocumentPanGesture,
-  DOCUMENT_ZOOM_STEP,
-} from "@/components/shared/document-viewport";
 import { FieldShell, ShellButton } from "@/components/shared/form-shell";
 import { FitBox, FitText } from "@/components/shared/fit-text";
 import {
@@ -42,6 +28,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { SigningActionBar } from "@/components/signing/signing-action-bar";
 import { SigningStateScreen } from "@/components/signing/signing-state-screen";
 import {
   TouchFieldEntry,
@@ -59,6 +46,12 @@ import {
   NUMBER_ENTRY_MESSAGE,
 } from "@/lib/field-choices";
 import { getInitials } from "@/lib/initials";
+import {
+  sortInReadingOrder,
+  startStep,
+  stepAfter,
+  stepBefore,
+} from "@/lib/signing-guide";
 import { truncateToWholeCharacters } from "@/lib/text-truncate";
 import { postToEmbedParent } from "./embed-parent-message";
 
@@ -295,54 +288,6 @@ function isActionSummaryField(field: SigningCurrentField) {
   return false;
 }
 
-function getCompletionValue(
-  field: SigningCurrentField,
-  fields: readonly SigningCurrentField[],
-  {
-    checkboxValues,
-    localDateLabel,
-    signatureValues,
-    signerName,
-    textValues,
-  }: EnteredValues & { localDateLabel: string; signerName: string },
-) {
-  if (field.type === "signature" || field.type === "initials") {
-    return signatureValues[field.id]?.value ?? "Tap to sign";
-  }
-
-  if (field.type === "name") {
-    return signerName;
-  }
-
-  if (field.type === "text") {
-    return textValues[field.id]?.trim() || "Enter text";
-  }
-
-  if (field.type === "number") {
-    return hasInvalidNumber(field, textValues)
-      ? "Not a number"
-      : textValues[field.id]?.trim() || "Enter a number";
-  }
-
-  if (field.type === "dropdown") {
-    return textValues[field.id]?.trim() || "Choose one";
-  }
-
-  if (field.type === "checkbox") {
-    return checkboxValues[field.id] ? "Checked" : "Optional";
-  }
-
-  if (field.type === "radio") {
-    const chosen = getRadioGroup(field, fields).find(
-      (button) => checkboxValues[button.id],
-    );
-
-    return chosen ? getFieldLabel(chosen) : "Choose one";
-  }
-
-  return localDateLabel;
-}
-
 function isFieldComplete(
   field: SigningCurrentField,
   fields: readonly SigningCurrentField[],
@@ -396,6 +341,37 @@ function getVisibleFieldValue(field: SigningVisibleField) {
   }
 
   return field.value?.trim() || getFieldLabel(field);
+}
+
+/** Whether the signer has put anything into the field, required or not. */
+function isFieldAnswered(
+  field: SigningCurrentField,
+  fields: readonly SigningCurrentField[],
+  { checkboxValues, signatureValues, textValues }: EnteredValues,
+) {
+  if (field.type === "signature" || field.type === "initials") {
+    return Boolean(signatureValues[field.id]?.value);
+  }
+
+  if (
+    field.type === "text" ||
+    field.type === "number" ||
+    field.type === "dropdown"
+  ) {
+    return (textValues[field.id] ?? "").trim().length > 0;
+  }
+
+  if (field.type === "checkbox") {
+    return Boolean(checkboxValues[field.id]);
+  }
+
+  if (field.type === "radio") {
+    return getRadioGroup(field, fields).some(
+      (button) => checkboxValues[button.id],
+    );
+  }
+
+  return true;
 }
 
 function buildSigningSubmissionPayload(
@@ -513,7 +489,6 @@ export function SigningLiveShell({
   const [isDeclineDialogOpen, setIsDeclineDialogOpen] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
-  const [isDocumentPanning, setIsDocumentPanning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Part 11 envelopes: the signer's email address and password, given again
   // for this signature, and their confirmation of what it means.
@@ -552,7 +527,6 @@ export function SigningLiveShell({
   const checkedAnswersRef = useRef<Record<string, string>>({});
   const latestTextValuesRef = useRef(textValues);
   const [drawnSignatureVersion, setDrawnSignatureVersion] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(DEFAULT_DOCUMENT_ZOOM_LEVEL);
   const [localDateLabel] = useState(() =>
     new Intl.DateTimeFormat("en-US", {
       day: "numeric",
@@ -560,8 +534,6 @@ export function SigningLiveShell({
       year: "numeric",
     }).format(new Date()),
   );
-  const paperGridRef = useRef<HTMLDivElement | null>(null);
-  const documentPanGestureRef = useRef<DocumentPanGesture | null>(null);
 
   const activePageRecord =
     record.pages.find((page) => page.pageNumber === activePage) ??
@@ -659,16 +631,6 @@ export function SigningLiveShell({
   const isInvalidEntry = (field: SigningCurrentField) =>
     hasInvalidNumber(field, textValues) ||
     (field.type === "text" && tooLongAnswers[field.id] !== undefined);
-  const requiredFieldCount = countAnswerableFields(
-    record.currentSignerFields,
-    (field) => field.required,
-  );
-  const completionPercent =
-    requiredFieldCount === 0
-      ? 100
-      : Math.round(
-          ((requiredFieldCount - remainingFields) / requiredFieldCount) * 100,
-        );
   const isDocumentReady = pdfRenderState === "ready";
 
   useEffect(() => {
@@ -757,15 +719,6 @@ export function SigningLiveShell({
 
     return () => window.clearTimeout(timer);
   }, [record.currentSignerFields, record.fieldFitUrl, textValues]);
-
-  function applyZoomLevel(nextZoomLevel: number) {
-    if (nextZoomLevel <= DEFAULT_DOCUMENT_ZOOM_LEVEL) {
-      setIsDocumentPanning(false);
-      documentPanGestureRef.current = null;
-    }
-
-    setZoomLevel(nextZoomLevel);
-  }
 
   function handleSignatureFieldClick(field: SigningCurrentField) {
     const fieldType = getSignatureFieldType(field);
@@ -961,37 +914,116 @@ export function SigningLiveShell({
     }
   }
 
-  function beginDocumentPan(event: ReactPointerEvent<HTMLDivElement>) {
-    documentPanGestureRef.current = beginDocumentPanGesture({
-      event,
-      scrollContainer: paperGridRef.current,
-      shouldIgnoreTarget: (target) =>
-        Boolean(target.closest("[data-signing-field='true']")),
-      zoomLevel,
-    });
-  }
+  // The guided walk through the fields the signer has to answer: Start, then
+  // Previous and Next. Each step scrolls to its field, marks it, and opens it.
+  const steps = sortInReadingOrder(actionSummaryFields);
+  const stepAnswered = steps.map((field) =>
+    isFieldAnswered(field, record.currentSignerFields, enteredValues),
+  );
+  const blockedSteps = steps.flatMap((field, index) =>
+    field.required &&
+    !isFieldComplete(field, record.currentSignerFields, enteredValues)
+      ? [index]
+      : [],
+  );
+  const [guide, setGuide] = useState<{
+    /** True once the field has opened (or taken focus) for this step. */
+    consumed: boolean;
+    index: number;
+    nonce: number;
+  } | null>(null);
+  const guideNonceRef = useRef(0);
+  const scrolledNonceRef = useRef(0);
+  const advanceRef = useRef<() => void>(() => undefined);
+  const guideStep = guide ? (steps[guide.index] ?? null) : null;
+  // What the field of the current step is asked to do: open, or take focus. An
+  // answered step is only shown, and a step is asked once.
+  const activation =
+    guide && guideStep && !guide.consumed && !stepAnswered[guide.index]
+      ? { fieldId: guideStep.id, nonce: guide.nonce }
+      : null;
 
-  function handleDocumentPanMove(event: ReactPointerEvent<HTMLDivElement>) {
-    moveDocumentPanGesture({
-      event,
-      gesture: documentPanGestureRef.current,
-      onPanStart: () => setIsDocumentPanning(true),
-      scrollContainer: paperGridRef.current,
-    });
-  }
+  function goToStep(index: number) {
+    const step = steps[index];
 
-  function endDocumentPan(event: ReactPointerEvent<HTMLDivElement>) {
-    if (
-      endDocumentPanGesture({
-        event,
-        gesture: documentPanGestureRef.current,
-        onPanEnd: () => setIsDocumentPanning(false),
-        scrollContainer: paperGridRef.current,
-      })
-    ) {
-      documentPanGestureRef.current = null;
+    guideNonceRef.current += 1;
+    setGuide({ consumed: false, index, nonce: guideNonceRef.current });
+
+    if (step && step.page !== activePage) {
+      setActivePage(step.page);
     }
   }
+
+  function advanceGuide() {
+    if (!guide) {
+      return;
+    }
+
+    const next = stepAfter(guide.index, steps.length, blockedSteps);
+
+    if (next !== null) {
+      goToStep(next);
+    }
+  }
+
+  // What a signer has just filled in is read when the next render has it, so
+  // moving on waits for that render.
+  function advanceSoon() {
+    window.setTimeout(() => advanceRef.current(), 0);
+  }
+
+  function markGuideConsumed() {
+    setGuide((current) =>
+      current && !current.consumed ? { ...current, consumed: true } : current,
+    );
+  }
+
+  useEffect(() => {
+    advanceRef.current = advanceGuide;
+  });
+
+  // Scroll the step's field into the upper middle of the screen once its page
+  // is drawn. Only the page scrolls here; opening the field is its own doing.
+  useEffect(() => {
+    if (!guide || !guideStep || scrolledNonceRef.current === guide.nonce) {
+      return;
+    }
+
+    if (guideStep.page !== activePage || !isDocumentReady) {
+      return;
+    }
+
+    scrolledNonceRef.current = guide.nonce;
+
+    const viewport = document.querySelector("[data-field-viewport]");
+
+    if (viewport instanceof HTMLElement) {
+      const rect = viewport.getBoundingClientRect();
+      const middle =
+        rect.top +
+        window.scrollY +
+        (guideStep.y + guideStep.height / 2) * rect.height;
+
+      window.scrollTo({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        top: Math.max(0, middle - window.innerHeight * 0.4),
+      });
+    }
+  }, [activePage, guide, guideStep, isDocumentReady]);
+
+  const actionBarAlerts = [
+    ...(invalidNumberCount > 0
+      ? [
+          `A number field marked in red does not hold a number. ${NUMBER_ENTRY_MESSAGE}`,
+        ]
+      : []),
+    ...tooLongFields.map(
+      (field) =>
+        `A text box on page ${field.page} is full: shorten your answer to ${tooLongAnswers[field.id]} characters or fewer so all of it fits on the document.`,
+    ),
+  ];
 
   if (hasDeclined) {
     return (
@@ -1042,7 +1074,7 @@ export function SigningLiveShell({
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col gap-5 px-4 pb-8 pt-1 sm:px-6">
+      <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col gap-4 pb-44 pt-1 sm:px-6">
         {signatureProblem && providerSignature ? (
           <div className="notice notice-danger" role="alert">
             {describeProviderProblem(
@@ -1051,115 +1083,21 @@ export function SigningLiveShell({
             )}
           </div>
         ) : null}
-        <section className="grid grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className="panel rounded-[1.25rem] px-4 py-3">
-              <div className="flex flex-col gap-3 xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center">
-                <div className="flex justify-center xl:justify-start">
-                  <DocumentZoomControls
-                    onDecrease={() =>
-                      applyZoomLevel(
-                        clampDocumentZoomLevel(zoomLevel - DOCUMENT_ZOOM_STEP),
-                      )
-                    }
-                    onIncrease={() =>
-                      applyZoomLevel(
-                        clampDocumentZoomLevel(zoomLevel + DOCUMENT_ZOOM_STEP),
-                      )
-                    }
-                    onReset={() => applyZoomLevel(DEFAULT_DOCUMENT_ZOOM_LEVEL)}
-                    zoomLevel={zoomLevel}
-                  />
-                </div>
-
-                <div className="flex items-center justify-center gap-3">
-                  <button
-                    aria-label="Previous page"
-                    className="btn-quiet size-10 px-0"
-                    disabled={activePage === 1}
-                    onClick={() =>
-                      setActivePage((page) => Math.max(1, page - 1))
-                    }
-                    type="button"
-                  >
-                    <ChevronLeftIcon className="size-4" />
-                  </button>
-                  <div className="min-w-[7.5rem] text-center">
-                    <p className="sr-only">Document page</p>
-                    <p className="text-sm font-bold text-(--fg)">
-                      {`Page ${activePage} of ${record.pageCount}`}
-                    </p>
-                  </div>
-                  <button
-                    aria-label="Next page"
-                    className="btn-quiet size-10 px-0"
-                    disabled={activePage === record.pageCount}
-                    onClick={() =>
-                      setActivePage((page) =>
-                        Math.min(record.pageCount, page + 1),
-                      )
-                    }
-                    type="button"
-                  >
-                    <ChevronRightIcon className="size-4" />
-                  </button>
-                </div>
-
-                <div className="flex justify-center xl:justify-end">
-                  <SigningToolbarStatus
-                    hasLockedFields={pageVisibleFields.length > 0}
-                    pageHasNoFields={
-                      isDocumentReady &&
-                      pageCurrentFields.length === 0 &&
-                      pageVisibleFields.length === 0
-                    }
-                    remainingFields={remainingFields}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="panel overflow-hidden rounded-[1.25rem]">
+        <div className="panel mx-auto w-full max-w-[920px] overflow-hidden rounded-none border-x-0 sm:rounded-[1.25rem] sm:border-x">
+          <div className="relative overflow-auto p-0 sm:p-6" data-paper-grid>
+            <div className="relative w-full overflow-hidden bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)] sm:rounded-md">
               <div
-                className={`relative overflow-auto p-3 sm:p-6 ${
-                  zoomLevel > DEFAULT_DOCUMENT_ZOOM_LEVEL
-                    ? isDocumentPanning
-                      ? "cursor-grabbing"
-                      : "cursor-grab"
-                    : ""
-                }`}
-                data-paper-grid
-                onPointerCancel={endDocumentPan}
-                onPointerDown={beginDocumentPan}
-                onPointerMove={handleDocumentPanMove}
-                onPointerUp={endDocumentPan}
-                ref={paperGridRef}
+                className="relative overflow-hidden"
+                data-field-viewport
+                style={{
+                  aspectRatio: `${activePageRecord?.widthPt ?? 8.5} / ${activePageRecord?.heightPt ?? 11}`,
+                }}
               >
-                <div
-                  className={`mx-auto ${
-                    zoomLevel > DEFAULT_DOCUMENT_ZOOM_LEVEL
-                      ? "w-full"
-                      : "flex justify-center"
-                  }`}
-                >
-                  <div
-                    className="relative overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)]"
-                    style={{
-                      width: `${zoomLevel * 100}%`,
-                    }}
-                  >
-                    <div
-                      className="relative overflow-hidden"
-                      data-field-viewport
-                      style={{
-                        aspectRatio: `${activePageRecord?.widthPt ?? 8.5} / ${activePageRecord?.heightPt ?? 11}`,
-                      }}
-                    >
-                      <PdfPageCanvas
-                        documentUrl={record.documentUrl}
-                        onRenderStateChange={setPdfRenderState}
-                        pageNumber={activePage}
-                      />
+                <PdfPageCanvas
+                  documentUrl={record.documentUrl}
+                  onRenderStateChange={setPdfRenderState}
+                  pageNumber={activePage}
+                />
 
                       {isDocumentReady
                         ? pageVisibleFields.map((field) => (
@@ -1217,129 +1155,70 @@ export function SigningLiveShell({
                                   [field.id]: value,
                                 }));
                               }}
+                              activation={activation}
+                              onActivationHandled={markGuideConsumed}
+                              onConfirm={advanceSoon}
                               signatureEntry={signatureValues[field.id]}
                               textValue={textValues[field.id] ?? ""}
                             />
                           ))
                         : null}
-                    </div>
-                  </div>
-                </div>
+
+                {isDocumentReady && guideStep && guideStep.page === activePage ? (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute z-3 animate-pulse rounded-md ring-4 ring-[rgb(var(--accent-rgb)/0.55)]"
+                    data-guide-highlight="true"
+                    style={getFieldFrame(guideStep)}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
-
-          <aside className="min-w-0 space-y-4 xl:sticky xl:top-[5.25rem] xl:self-start">
-            <section className="panel rounded-[1.25rem] p-5">
-              <p className="section-eyebrow">Current signer</p>
-              <div className="mt-3 flex items-center gap-3">
-                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-(--accent-soft) text-[0.9375rem] font-bold text-(--accent-ink)">
-                  {getSignerInitials(record.signer.name)}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-[0.9375rem] font-bold text-(--fg)">
-                    {record.signer.name}
-                  </p>
-                  <p className="truncate text-sm text-(--secondary)">
-                    {record.signer.email}
-                  </p>
-                </div>
-              </div>
-
-              <div className="well mt-5 p-4">
-                <p className="section-eyebrow">Ready to finish</p>
-                <p className="mt-1.5 text-[0.9375rem] font-bold text-(--fg)">
-                  {remainingFields === 0
-                    ? "All required fields complete"
-                    : `${remainingFields} required field${remainingFields === 1 ? "" : "s"} remaining`}
-                </p>
-                {invalidNumberCount > 0 ? (
-                  <p
-                    className="mt-1.5 text-[0.8125rem] font-semibold leading-5 text-(--danger)"
-                    role="alert"
-                  >
-                    A number field marked in red does not hold a number.{" "}
-                    {NUMBER_ENTRY_MESSAGE}
-                  </p>
-                ) : null}
-                {tooLongFields.map((field) => (
-                  <p
-                    className="mt-1.5 text-[0.8125rem] font-semibold leading-5 text-(--danger)"
-                    key={field.id}
-                    role="alert"
-                  >
-                    A text box on page {field.page} is full: shorten your answer
-                    to {tooLongAnswers[field.id]} characters or fewer so all of
-                    it fits on the document.
-                  </p>
-                ))}
-                <div
-                  aria-hidden="true"
-                  className="mt-3 h-2 overflow-hidden rounded-full bg-(--surface-strong)"
-                >
-                  <div
-                    className={`h-full rounded-full transition-[width] duration-300 ${
-                      remainingFields === 0 ? "bg-(--success)" : "bg-(--accent)"
-                    }`}
-                    style={{ width: `${completionPercent}%` }}
-                  />
-                </div>
-                <p className="mt-3 text-[0.8125rem] leading-5 text-(--secondary)">
-                  Previous signer values stay visible but locked. Only your
-                  assigned fields are interactive.
-                </p>
-              </div>
-
-              <div className="mt-4">
-                <ShellButton
-                  className="w-full"
-                  disabled={!canFinish || isDeclining || isSubmitting}
-                  onClick={() => {
-                    setSubmitError(null);
-                    setIsFinishDialogOpen(true);
-                  }}
-                >
-                  Finish
-                </ShellButton>
-              </div>
-            </section>
-
-            <section className="panel rounded-[1.25rem] p-5">
-              <div className="flex items-center justify-between gap-3">
-                <p className="section-eyebrow">Assigned fields</p>
-                <span className="pill pill-neutral">
-                  {actionSummaryFields.length}
-                </span>
-              </div>
-              <div className="mt-3 space-y-2">
-                {actionSummaryFields.map((field) => (
-                  <FieldStatusRow
-                    isComplete={isFieldComplete(
-                      field,
-                      record.currentSignerFields,
-                      enteredValues,
-                    )}
-                    isInvalid={isInvalidEntry(field)}
-                    key={field.id}
-                    label={`${getSummaryLabel(field)} · Page ${field.page}`}
-                    value={getCompletionValue(
-                      field,
-                      record.currentSignerFields,
-                      {
-                        ...enteredValues,
-                        localDateLabel,
-                        signerName: record.signer.name,
-                      },
-                    )}
-                  />
-                ))}
-              </div>
-            </section>
-          </aside>
-        </section>
+        </div>
       </main>
 
       <PublicLegalFooter />
+
+      <SigningActionBar
+        alerts={actionBarAlerts}
+        canFinish={canFinish}
+        finishDisabled={!canFinish || isDeclining || isSubmitting}
+        hasSteps={steps.length > 0}
+        isStarted={guide !== null}
+        onFinish={() => {
+          setSubmitError(null);
+          setIsFinishDialogOpen(true);
+        }}
+        onNext={advanceGuide}
+        onPrevious={() => {
+          if (guide) {
+            goToStep(stepBefore(guide.index));
+          }
+        }}
+        onStart={() => goToStep(startStep(stepAnswered))}
+        pages={
+          record.pageCount > 1
+            ? {
+                active: activePage,
+                count: record.pageCount,
+                onNext: () =>
+                  setActivePage((page) => Math.min(record.pageCount, page + 1)),
+                onPrevious: () =>
+                  setActivePage((page) => Math.max(1, page - 1)),
+              }
+            : null
+        }
+        progress={
+          guide && guideStep
+            ? {
+                current: guide.index + 1,
+                label: getSummaryLabel(guideStep),
+                total: steps.length,
+              }
+            : null
+        }
+      />
 
       {signatureModal ? (
         <SignatureModal
@@ -1361,6 +1240,7 @@ export function SigningLiveShell({
             }));
             setSubmitError(null);
             setSignatureModal(null);
+            advanceSoon();
           }}
           onClearDrawnSignature={() =>
             setDrawnSignatureVersion((current) => current + 1)
@@ -1619,70 +1499,15 @@ export function SigningLiveShell({
   );
 }
 
-function SigningToolbarStatus({
-  hasLockedFields,
-  pageHasNoFields,
-  remainingFields,
-}: {
-  hasLockedFields: boolean;
-  pageHasNoFields: boolean;
-  remainingFields: number;
-}) {
-  return (
-    <div className="inline-flex min-h-10 items-center gap-2.5 rounded-full bg-(--surface) py-1.5 pl-2.5 pr-4">
-      <span
-        aria-hidden="true"
-        className={`inline-flex size-6 items-center justify-center rounded-full ${
-          remainingFields === 0
-            ? "bg-(--success-soft) text-(--success)"
-            : "bg-(--accent) text-white"
-        }`}
-      >
-        {remainingFields === 0 ? (
-          <svg
-            aria-hidden="true"
-            className="size-3.5"
-            fill="none"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M3.5 8.5 6.5 11.5 12.5 4.5"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-            />
-          </svg>
-        ) : (
-          <span className="text-[11px] font-bold leading-none">
-            {remainingFields}
-          </span>
-        )}
-      </span>
-      <div className="min-w-0">
-        <p className="text-[0.8125rem] font-bold leading-tight text-(--fg)">
-          {remainingFields === 0
-            ? "Ready to finish"
-            : `${remainingFields} required remaining`}
-        </p>
-        <p className="text-xs leading-tight text-(--tertiary)">
-          {pageHasNoFields
-            ? "No fields on this page"
-            : hasLockedFields
-              ? "Locked values visible"
-              : "Current signer view"}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function CurrentSignerField({
+  activation = null,
   checkboxValue,
   field,
   isInvalid,
   localDateLabel,
+  onActivationHandled,
   onCheckboxChange,
+  onConfirm,
   onSignatureClick,
   onTextChange,
   signatureEntry,
@@ -1690,12 +1515,17 @@ function CurrentSignerField({
   textValue,
   tooLongMessage = null,
 }: {
+  /** Set when a guided step asks this field to open or take focus. */
+  activation?: { fieldId: string; nonce: number } | null;
   checkboxValue: boolean;
   field: SigningCurrentField;
   /** True for a number field holding something that is not a number. */
   isInvalid: boolean;
   localDateLabel: string;
+  onActivationHandled?: () => void;
   onCheckboxChange: (checked: boolean) => void;
+  /** Called when the signer finishes an entry in a sheet, to move on. */
+  onConfirm?: () => void;
   onSignatureClick: () => void;
   onTextChange: (value: string) => void;
   signatureEntry?: SignatureEntry;
@@ -1711,6 +1541,39 @@ function CurrentSignerField({
   // On a phone the boxes on the page are too small to type in, so tapping one
   // opens a full-size sheet instead.
   const touchEntry = useTouchEntry();
+  const isActivated = activation?.fieldId === field.id;
+
+  // A guided step asks the field to open. A signature opens its box. On a
+  // screen with a keyboard a typed answer takes the cursor, and on a phone its
+  // sheet opens by itself. A tick box has nothing to open.
+  useEffect(() => {
+    if (!isActivated) {
+      return;
+    }
+
+    if (field.type === "signature" || field.type === "initials") {
+      onSignatureClick();
+      onActivationHandled?.();
+      return;
+    }
+
+    if (
+      !touchEntry &&
+      (field.type === "text" ||
+        field.type === "number" ||
+        field.type === "dropdown")
+    ) {
+      document.getElementById(`signing-field-${field.id}`)?.focus();
+      onActivationHandled?.();
+      return;
+    }
+
+    if (field.type === "checkbox" || field.type === "radio") {
+      onActivationHandled?.();
+    }
+    // The nonce says when a step asks, not when a callback is made again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activation?.nonce, isActivated, touchEntry]);
 
   if (field.type === "signature" || field.type === "initials") {
     return (
@@ -1793,6 +1656,9 @@ function CurrentSignerField({
           kind="text"
           label={getFieldLabel(field)}
           onChange={onTextChange}
+          onConfirm={onConfirm}
+          onOpened={onActivationHandled}
+          openSignal={isActivated ? activation.nonce : 0}
           placeholder={getFieldLabel(field)}
           value={textValue}
         />
@@ -1843,6 +1709,9 @@ function CurrentSignerField({
           kind="number"
           label={getFieldLabel(field)}
           onChange={onTextChange}
+          onConfirm={onConfirm}
+          onOpened={onActivationHandled}
+          openSignal={isActivated ? activation.nonce : 0}
           placeholder="Number"
           value={textValue}
         />
@@ -1890,6 +1759,9 @@ function CurrentSignerField({
           kind="dropdown"
           label={getFieldLabel(field)}
           onChange={onTextChange}
+          onConfirm={onConfirm}
+          onOpened={onActivationHandled}
+          openSignal={isActivated ? activation.nonce : 0}
           options={field.options ?? []}
           placeholder={field.required ? "Choose one" : "No answer"}
           required={field.required}
@@ -2515,40 +2387,5 @@ function DialogFrame({
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function FieldStatusRow({
-  isComplete,
-  isInvalid,
-  label,
-  value,
-}: {
-  isComplete: boolean;
-  /** Filled in, but with something the field cannot take. */
-  isInvalid: boolean;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="well flex items-center justify-between gap-3 rounded-xl px-3.5 py-3">
-      <div className="min-w-0">
-        <p className="text-xs font-semibold text-(--tertiary)">{label}</p>
-        <p className="mt-0.5 truncate text-sm font-semibold text-(--fg)">
-          {value}
-        </p>
-      </div>
-      <span
-        className={`pill shrink-0 ${
-          isInvalid
-            ? "pill-danger"
-            : isComplete
-              ? "pill-success"
-              : "pill-accent"
-        }`}
-      >
-        {isInvalid ? "Fix this" : isComplete ? "Complete" : "Required"}
-      </span>
-    </div>
   );
 }
