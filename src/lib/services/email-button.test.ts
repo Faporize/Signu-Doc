@@ -82,3 +82,17 @@ test("the invitation email does not say an account is not needed", () => {
   assert.ok(!(message.htmlBody ?? "").includes("account to sign"));
   assert.ok(!message.textBody.includes("account to sign"));
 });
+
+test("the invitation email ends with who sent it", () => {
+  const message = buildSigningInvitationEmail({
+    branding: { ...branding, supportAddress: "help@acme.com" },
+    envelopeTitle: "Loan agreement",
+    senderName: "Deion Au",
+    signerEmail: "jane@example.com",
+    signerName: "Jane",
+    signingUrl: "https://sign.acme.com/sign/abc123",
+  });
+
+  assert.match(message.textBody, /Sent by Deion Au$/);
+  assert.ok(!message.textBody.includes("using"));
+});

@@ -59,6 +59,8 @@ export function buildSigningInvitationEmail(
       textBody,
     },
     input.branding,
+    undefined,
+    { sentBy: input.senderName },
   );
 
   return {

@@ -284,6 +284,8 @@ function buildReminderEmail(input: {
       textBody,
     },
     input.branding,
+    undefined,
+    { sentBy: input.senderName },
   );
 
   return {
