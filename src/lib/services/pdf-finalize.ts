@@ -9,6 +9,12 @@ import {
 } from "../schemas/envelope.ts";
 import type { FieldRecord } from "../schemas/field.ts";
 import type { SignerRecord } from "../schemas/signer.ts";
+import { formatLocalSigningDate } from "../local-signing-date.ts";
+import {
+  chooseSignatureDateLayout,
+  splitSignatureBox,
+  type SignatureBox,
+} from "../signature-date-layout.ts";
 import { buildSignatureManifestation } from "../signature-meanings.ts";
 import { hasSharedSigningStep, signingStepOf } from "../signing-steps.ts";
 import { describeSignerCorrectedEvent } from "./audit.ts";
@@ -688,6 +694,7 @@ export async function stampFieldValue(
   // the page, and so reads upright. A caller that draws on another page
   // than the one the field is on passes that page's geometry.
   geometry: DisplayedPageGeometry = getDisplayedPageGeometry(page),
+  options: StampOptions = {},
 ): Promise<void> {
   if (!shouldStampField(field)) {
     return;
@@ -702,8 +709,43 @@ export async function stampFieldValue(
       imageCache,
       pdfDocument,
       storageService,
+      options,
     ),
   );
+}
+
+/** What a caller may ask a stamp to add. */
+export type StampOptions = {
+  /**
+   * The day the signer signed, written inside a signature's box, under it. Left out, the signature is drawn alone.
+   */
+  signatureDate?: string | null;
+};
+
+/** The day, drawn small and grey, in the part of a signature box given to it. */
+function drawSignatureDate(
+  page: PDFPage,
+  font: TextFace,
+  label: string,
+  box: SignatureBox,
+  padding: number,
+) {
+  const maxWidth = Math.max(4, box.width - padding * 2);
+  const maxHeight = Math.max(4, box.height - padding);
+  const size = fitTextSize(
+    font,
+    label,
+    maxWidth,
+    maxHeight,
+    Math.min(maxHeight * 0.8, 9),
+  );
+
+  font.drawText(page, label, {
+    color: rgb(0.32, 0.32, 0.38),
+    size,
+    x: box.x + padding,
+    y: box.y + (box.height - size) / 2 + size * 0.1,
+  });
 }
 
 async function drawFieldValue(
@@ -717,6 +759,7 @@ async function drawFieldValue(
   imageCache: Map<string, PDFImage>,
   pdfDocument: PDFDocument,
   storageService: StorageService,
+  options: StampOptions,
 ): Promise<void> {
   const rect = normalizedRectToPdfRect(field, geometry);
   const padding = getFieldPadding(rect.widthPt, rect.heightPt);
@@ -724,6 +767,31 @@ async function drawFieldValue(
   switch (field.type) {
     case "signature":
     case "initials": {
+      // A signature carries the day it was signed, under it when the box
+      // has room, so the sender need not place a date field.
+      const wholeBox: SignatureBox = {
+        height: rect.heightPt,
+        width: rect.widthPt,
+        x: rect.xPt,
+        y: rect.yPt,
+      };
+      const dateLayout = options.signatureDate
+        ? chooseSignatureDateLayout(rect)
+        : null;
+      const parts = dateLayout ? splitSignatureBox(wholeBox) : null;
+      const area = parts?.signature ?? wholeBox;
+      const drawDate = () => {
+        if (parts && options.signatureDate) {
+          drawSignatureDate(
+            page,
+            fonts.auditRegular,
+            options.signatureDate,
+            parts.date,
+            padding,
+          );
+        }
+      };
+
       if (field.inputMethod === "drawn" && field.imageKey) {
         const image = await getEmbeddedPng(
           field.imageKey,
@@ -731,11 +799,11 @@ async function drawFieldValue(
           pdfDocument,
           storageService,
         );
-        const maxWidth = Math.max(4, rect.widthPt - padding * 2);
-        const maxHeight = Math.max(4, rect.heightPt - padding * 2);
+        const maxWidth = Math.max(4, area.width - padding * 2);
+        const maxHeight = Math.max(4, area.height - padding * 2);
         const scaled = image.scaleToFit(maxWidth, maxHeight);
-        const x = rect.xPt + (rect.widthPt - scaled.width) / 2;
-        const y = rect.yPt + (rect.heightPt - scaled.height) / 2;
+        const x = area.x + (area.width - scaled.width) / 2;
+        const y = area.y + (area.height - scaled.height) / 2;
 
         page.drawImage(image, {
           height: scaled.height,
@@ -743,6 +811,7 @@ async function drawFieldValue(
           x,
           y,
         });
+        drawDate();
 
         return;
       }
@@ -753,22 +822,23 @@ async function drawFieldValue(
         return;
       }
 
-      const maxWidth = Math.max(12, rect.widthPt - padding * 2);
-      const maxHeight = Math.max(10, rect.heightPt - padding * 2);
+      const maxWidth = Math.max(12, area.width - padding * 2);
+      const maxHeight = Math.max(10, area.height - padding * 2);
       const fontSize = fitTextSize(
         fonts.signature,
         signatureValue,
         maxWidth,
         maxHeight,
-        Math.min(maxHeight, rect.heightPt * 0.9),
+        Math.min(maxHeight, area.height * 0.9),
       );
 
       fonts.signature.drawText(page, signatureValue, {
         color: rgb(0.12, 0.12, 0.12),
         size: fontSize,
-        x: rect.xPt + padding,
-        y: rect.yPt + (rect.heightPt - fontSize) / 2 + fontSize * 0.1,
+        x: area.x + padding,
+        y: area.y + (area.height - fontSize) / 2 + fontSize * 0.1,
       });
+      drawDate();
 
       return;
     }
@@ -1723,12 +1793,55 @@ export async function renderFinalizedEnvelopePdf(
       }
     }
   }
+  // Each signature is stamped with the day the signer signed, on the signer's
+  // own clock, which their device reported when they signed. A signer who
+  // placed a date field themselves on that page gets no second one.
+  const signerClockOffsets = new Map<string, number>();
+
+  for (const event of input.auditEvents) {
+    const signerId = event.metadata?.signerId;
+    const offset = event.metadata?.timezoneOffsetMinutes;
+
+    if (
+      event.event === "signed" &&
+      typeof signerId === "string" &&
+      typeof offset === "number"
+    ) {
+      signerClockOffsets.set(signerId, offset);
+    }
+  }
+
+  const pagesWithOwnDate = new Set(
+    input.fields
+      .filter((field) => field.type === "date")
+      .map((field) => `${field.signerId}:${String(field.page)}`),
+  );
+  const signatureDates = new Map<string, string>();
+
+  for (const field of stampedFields) {
+    const offset = signerClockOffsets.get(field.signerId);
+
+    if (
+      field.id !== undefined &&
+      field.type === "signature" &&
+      typeof field.submittedAt === "number" &&
+      offset !== undefined &&
+      !pagesWithOwnDate.has(`${field.signerId}:${String(field.page)}`)
+    ) {
+      signatureDates.set(
+        field.id,
+        formatLocalSigningDate(field.submittedAt, offset),
+      );
+    }
+  }
+
   // The signed document embeds glyphs for the stamped values only. The
   // certificate's wording is added when the audit trail is appended to it.
   const faces = await embedTextFaces(
     pdfDocument,
     [
       stampedFields.map((field) => field.value),
+      [...signatureDates.values()],
       [...manifestations.values()],
       input.includeAuditTrail
         ? [
@@ -1778,6 +1891,12 @@ export async function renderFinalizedEnvelopePdf(
       pdfDocument,
       storageService,
       geometry,
+      {
+        signatureDate:
+          placedField.id === undefined
+            ? null
+            : (signatureDates.get(placedField.id) ?? null),
+      },
     );
 
     const manifestation =

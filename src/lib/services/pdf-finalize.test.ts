@@ -1082,3 +1082,88 @@ test("the new wording leaves the audit fingerprint of a captured email unchanged
     "876cbd8661559c69681db5458f3baf2f8e1c8ccc4c43c9352691608e68b61c32",
   );
 });
+
+async function renderSigned(
+  fixture: Awaited<ReturnType<typeof makeFixture>>,
+  overrides: {
+    auditEvents?: AuditEventRecord[];
+    fields?: FieldRecord[];
+  } = {},
+) {
+  const pdfBytes = await renderFinalizedEnvelopePdf(
+    {
+      auditEvents: overrides.auditEvents ?? fixture.auditEvents,
+      completedAt: fixture.envelope.completedAt!,
+      envelope: fixture.envelope,
+      fields: overrides.fields ?? fixture.fields,
+      signers: fixture.signers,
+      pages: [],
+      sourcePdfKey: fixture.envelope.sourcePdfKey,
+    },
+    { seal: saveUnsealed, storageService: fixture.storageService },
+  );
+
+  return (await extractText(pdfBytes)).replace(/\s+/g, " ");
+}
+
+// signer-1 signed at 1_799_999_900: 07:58 on 15 January 2027 in UTC, which is
+// still the evening of 14 January for someone in California (UTC-8).
+function withClockOffset(
+  events: AuditEventRecord[],
+  timezoneOffsetMinutes: number,
+): AuditEventRecord[] {
+  return events.map((event) =>
+    event.event === "signed"
+      ? {
+          ...event,
+          metadata: { ...event.metadata, timezoneOffsetMinutes },
+        }
+      : event,
+  );
+}
+
+test("a signature is stamped with the day on the signer's own clock", async () => {
+  const fixture = await makeFixture();
+  const californian = await renderSigned(fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 480),
+  });
+  const utc = await renderSigned(fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 0),
+  });
+
+  assert.ok(californian.includes("January 14, 2027"));
+  assert.ok(!californian.includes("January 15, 2027"));
+  assert.ok(utc.includes("January 15, 2027"));
+  // No time zone is written next to it.
+  assert.doesNotMatch(californian, /January 14, 2027 ?(UTC|GMT|PST|PT)/);
+});
+
+test("a signature is stamped alone when the signer's clock is not known", async () => {
+  const fixture = await makeFixture();
+  const text = await renderSigned(fixture);
+
+  assert.ok(text.includes(SIGNER_NAME));
+  assert.doesNotMatch(text, /January 1[45], 2027/);
+});
+
+test("a signer who placed their own date field gets no second date", async () => {
+  const fixture = await makeFixture();
+  const withDateField: FieldRecord[] = [
+    ...fixture.fields,
+    {
+      ...fixture.fields[0]!,
+      id: "field-date",
+      inputMethod: "auto",
+      type: "date",
+      value: "March 3, 2027",
+      y: 0.6,
+    },
+  ];
+  const text = await renderSigned(fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 480),
+    fields: withDateField,
+  });
+
+  assert.ok(text.includes("March 3, 2027"));
+  assert.ok(!text.includes("January 14, 2027"));
+});

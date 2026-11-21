@@ -167,7 +167,8 @@ const fieldTools: readonly FieldTool[] = [
   },
   {
     defaultHeight: 0.045,
-    defaultWidth: 0.12,
+    // Wide enough for a date such as "November 21, 2026" at a readable size.
+    defaultWidth: 0.2,
     label: "Date",
     minHeight: 0.0045,
     minWidth: 0.006,

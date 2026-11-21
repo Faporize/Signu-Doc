@@ -1,7 +1,13 @@
 "use client";
 
-import { type CSSProperties, useState, useSyncExternalStore } from "react";
+import {
+  type CSSProperties,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
+import { FitText } from "@/components/shared/fit-text";
 import { ShellButton } from "@/components/shared/form-shell";
 import {
   Dialog,
@@ -43,6 +49,12 @@ type TouchFieldEntryProps = {
   kind: "dropdown" | "number" | "text";
   label: string;
   onChange: (value: string) => void;
+  /** Called when the signer taps Done, so the guided flow can move on. */
+  onConfirm?: () => void;
+  /** Called once a guided step has opened the sheet. */
+  onOpened?: () => void;
+  /** Opens the sheet whenever this is set to a new number (a guided step). */
+  openSignal?: number;
   options?: string[];
   placeholder: string;
   required?: boolean;
@@ -61,13 +73,37 @@ export function TouchFieldEntry({
   kind,
   label,
   onChange,
+  onConfirm,
+  onOpened,
+  openSignal = 0,
   options = [],
   placeholder,
   required = false,
   value,
 }: TouchFieldEntryProps) {
   const [open, setOpen] = useState(false);
+  const [handledSignal, setHandledSignal] = useState(0);
   const shown = value.trim();
+
+  // A new signal opens the sheet. It is read while drawing, not in an effect,
+  // so the sheet is already open when this field first shows.
+  if (openSignal > handledSignal) {
+    setHandledSignal(openSignal);
+    setOpen(true);
+  }
+
+  useEffect(() => {
+    if (openSignal > 0) {
+      onOpened?.();
+    }
+    // Only a new signal counts, not a new callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openSignal]);
+
+  function confirm() {
+    setOpen(false);
+    onConfirm?.();
+  }
 
   return (
     <>
@@ -81,13 +117,12 @@ export function TouchFieldEntry({
         style={frame}
         type="button"
       >
-        <span
-          className={`block truncate px-2 text-sm ${
-            shown ? "text-(--fg)" : "text-(--placeholder)"
-          }`}
-        >
-          {shown || placeholder}
-        </span>
+        <FitText
+          align="start"
+          className={shown ? "text-(--fg)" : "text-(--placeholder)"}
+          paddingX={8}
+          text={shown || placeholder}
+        />
       </button>
 
       <Dialog onOpenChange={setOpen} open={open}>
@@ -99,7 +134,7 @@ export function TouchFieldEntry({
             className="grid gap-5"
             onSubmit={(event) => {
               event.preventDefault();
-              setOpen(false);
+              confirm();
             }}
           >
             <DialogHeader className="space-y-2">
@@ -120,7 +155,9 @@ export function TouchFieldEntry({
                 onChange={(event) => onChange(event.target.value)}
                 value={value}
               >
-                <option value="">{required ? "Choose one" : "No answer"}</option>
+                <option value="">
+                  {required ? "Choose one" : "No answer"}
+                </option>
                 {options.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -147,9 +184,7 @@ export function TouchFieldEntry({
               </p>
             ) : null}
 
-            <ShellButton onClick={() => setOpen(false)} type="submit">
-              Done
-            </ShellButton>
+            <ShellButton type="submit">Done</ShellButton>
           </form>
         </DialogContent>
       </Dialog>

@@ -469,9 +469,9 @@
 }
 
 /*
- * Phone behavior. These sit outside the layers on purpose: unlayered rules win
- * over Tailwind utilities such as text-sm, which a plain input would otherwise
- * keep.
+ * Phone behavior. The input size sits outside the layers on purpose: unlayered
+ * rules win over Tailwind utilities such as text-sm, which a plain input would
+ * otherwise keep.
  */
 html {
   /* No grey flash over whatever was tapped; buttons show their own :active. */
@@ -483,28 +483,33 @@ html {
   overscroll-behavior-y: none;
 }
 
-/* A tap fires at once instead of waiting to see whether it is a double-tap. */
-a,
-button,
-summary,
-label,
-[role="button"],
-[role="checkbox"],
-[role="radio"],
-[role="tab"] {
-  touch-action: manipulation;
-}
+/* Touch behavior of controls. These live in the base layer so a utility on an
+   element still wins: a field being dragged on the page has touch-none, and
+   these rules must not hand its drag back to the browser as a page scroll. */
+@layer base {
+  /* A tap fires at once instead of waiting to see whether it is a double-tap. */
+  a,
+  button,
+  summary,
+  label,
+  [role="button"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="tab"] {
+    touch-action: manipulation;
+  }
 
-/* Controls are not text to select: a long press on a button should not
-   highlight its label or open the copy callout. Content stays selectable. */
-button,
-[role="button"],
-[role="checkbox"],
-[role="radio"],
-[role="tab"] {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+  /* Controls are not text to select: a long press on a button should not
+     highlight its label or open the copy callout. Content stays selectable. */
+  button,
+  [role="button"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="tab"] {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /* iPhone Safari zooms the whole page into any field set below 16px and does
