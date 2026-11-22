@@ -8,7 +8,7 @@ import {
   nameSchema,
   nonEmptyStringSchema,
 } from "./common.ts";
-import { duplicateSignerEmailMessage } from "./signer.ts";
+import { duplicateSignerEmailMessage, signerKey } from "./signer.ts";
 
 export const MAX_TEMPLATE_ROLE_NAME_LENGTH = 60;
 
@@ -93,7 +93,7 @@ export const useTemplateSchema = z.object({
       const emails = new Set<string>();
 
       for (const [index, signer] of signers.entries()) {
-        const email = signer.email.toLowerCase();
+        const email = signerKey(signer);
 
         if (emails.has(email)) {
           ctx.addIssue({

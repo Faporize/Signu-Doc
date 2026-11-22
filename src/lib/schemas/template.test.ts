@@ -77,11 +77,22 @@ test("using a template takes a title and one person for each signer", () => {
     useTemplateSchema.safeParse({
       signers: [
         { email: "a@example.com", name: "Ann" },
-        { email: "A@example.com", name: "Bob" },
+        { email: "A@example.com", name: " ann " },
       ],
       title: "Lease",
     }).success,
     false,
+  );
+  // One address may fill two roles when the names differ.
+  assert.equal(
+    useTemplateSchema.safeParse({
+      signers: [
+        { email: "a@example.com", name: "Ann" },
+        { email: "A@example.com", name: "Bob" },
+      ],
+      title: "Lease",
+    }).success,
+    true,
   );
   assert.equal(
     useTemplateSchema.safeParse({ signers: [], title: "Lease" }).success,

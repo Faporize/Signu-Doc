@@ -647,6 +647,7 @@ test("another signer's email is refused", async () => {
   await assert.rejects(
     correct(userId, envelopeId, second.signerId, {
       email: "riley@example.test",
+      name: "Riley Recipient",
     }),
     (error: unknown) => {
       assert.ok(error instanceof EnvelopeMutationError);
@@ -656,6 +657,26 @@ test("another signer's email is refused", async () => {
     },
   );
   assert.equal((await readSigner(first.signerId)).email, "riley@example.test");
+});
+
+test("another signer's email is allowed when the name differs", async () => {
+  const { userId } = await createOwner();
+  const envelopeId = await createEnvelope({ userId });
+
+  await createSigner({ email: "riley@example.test", envelopeId });
+
+  const second = await createSigner({
+    email: "casey@example.test",
+    envelopeId,
+    name: "Casey Second",
+    signOrder: 2,
+    status: "pending",
+  });
+
+  await correct(userId, envelopeId, second.signerId, {
+    email: "riley@example.test",
+  });
+  assert.equal((await readSigner(second.signerId)).email, "riley@example.test");
 });
 
 test("a signed or declined signer cannot be corrected", async () => {

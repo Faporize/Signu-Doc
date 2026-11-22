@@ -6,7 +6,7 @@ import { getSignerPalette } from "@/components/envelopes/signer-palette";
 import { ShellButton } from "@/components/shared/form-shell";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusPanel } from "@/components/shared/status-panel";
-import { duplicateSignerEmailMessage } from "@/lib/schemas/signer";
+import { duplicateSignerEmailMessage, signerKey } from "@/lib/schemas/signer";
 import type { UseTemplateData } from "@/lib/templates";
 
 type UseTemplateShellProps = {
@@ -35,7 +35,9 @@ function findErrors(people: readonly Person[]): PersonErrors[] {
     const email = person.email.trim().toLowerCase();
 
     if (email) {
-      emailCounts.set(email, (emailCounts.get(email) ?? 0) + 1);
+      const key = signerKey(person);
+
+      emailCounts.set(key, (emailCounts.get(key) ?? 0) + 1);
     }
   }
 
@@ -49,7 +51,7 @@ function findErrors(people: readonly Person[]): PersonErrors[] {
 
     if (!validEmailPattern.test(email)) {
       errors.email = "Enter a valid email address";
-    } else if ((emailCounts.get(email) ?? 0) > 1) {
+    } else if ((emailCounts.get(signerKey(person)) ?? 0) > 1) {
       errors.email = duplicateSignerEmailMessage;
     }
 

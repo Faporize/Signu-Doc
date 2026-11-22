@@ -14,8 +14,11 @@ import type { DraftSignerStepData } from "@/lib/envelopes";
 import {
   duplicateCopyRecipientEmailMessage,
   duplicateSignerEmailMessage,
+  signerKey,
   type ReplaceSignersResponse,
 } from "@/lib/schemas/signer";
+import { ContactPicker } from "@/components/contacts/contact-picker";
+import type { Contact } from "@/lib/contacts";
 import { SIGNATURE_MEANING_DETAILS } from "@/lib/signature-meanings";
 import { moveListedSigner, removeListedSigner } from "@/lib/signing-steps";
 import {
@@ -32,6 +35,8 @@ const genericSubmitError = "Something went wrong. Please try again.";
 
 type SignersShellProps = {
   envelopeId: string;
+  /** The sender's saved contacts, to fill in a name and email from. */
+  contacts?: readonly Contact[];
   initialState?: "error";
   record?: DraftSignerStepData;
 };
@@ -241,7 +246,9 @@ function buildSignerErrors(signers: readonly ShellSigner[]) {
       const normalizedEmail = signer.email.trim().toLowerCase();
 
       if (normalizedEmail.length > 0) {
-        counts[normalizedEmail] = (counts[normalizedEmail] ?? 0) + 1;
+        const key = signerKey(signer);
+
+        counts[key] = (counts[key] ?? 0) + 1;
       }
 
       return counts;
@@ -263,7 +270,7 @@ function buildSignerErrors(signers: readonly ShellSigner[]) {
       !validEmailPattern.test(normalizedEmail)
     ) {
       signerErrors.email = "Enter a valid email address";
-    } else if (emailCounts[normalizedEmail] > 1) {
+    } else if (emailCounts[signerKey(signer)] > 1) {
       signerErrors.email = duplicateSignerEmailMessage;
     }
 
@@ -373,6 +380,8 @@ function SignerCard({
   onRemove,
   onTogetherChange,
   accessCodeError,
+  contacts = [],
+  onPickContact,
   part11Mode = false,
   previousStepLabel,
   showStep,
@@ -381,6 +390,8 @@ function SignerCard({
   stepSize,
 }: {
   accessCodeError?: string;
+  contacts?: readonly Contact[];
+  onPickContact?: (contact: Contact) => void;
   part11Mode?: boolean;
   /** Who signs in the step before this signer's, as "Signer 2". */
   previousStepLabel: string | null;
@@ -498,6 +509,14 @@ function SignerCard({
               Later
               <ChevronRightIcon aria-hidden="true" className="-mr-1 size-4" />
             </button>
+            {onPickContact ? (
+              <ContactPicker
+                contacts={contacts}
+                disabled={disabled}
+                label={`signer ${order}`}
+                onPick={onPickContact}
+              />
+            ) : null}
             <button
               aria-label={`Remove signer ${order}`}
               className="btn-quiet btn-quiet-danger"
@@ -684,6 +703,8 @@ function SignerCard({
 }
 
 function CopyRecipientCard({
+  contacts = [],
+  onPickContact,
   disabled = false,
   emailError,
   index,
@@ -693,6 +714,8 @@ function CopyRecipientCard({
   onRemove,
   recipient,
 }: {
+  contacts?: readonly Contact[];
+  onPickContact?: (contact: Contact) => void;
   disabled?: boolean;
   emailError?: string;
   index: number;
@@ -709,15 +732,25 @@ function CopyRecipientCard({
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <span className="pill pill-neutral">Copy {position}</span>
-          <button
-            aria-label={`Remove copy recipient ${position}`}
-            className="btn-quiet btn-quiet-danger"
-            disabled={disabled}
-            onClick={onRemove}
-            type="button"
-          >
-            Remove
-          </button>
+          <div className="flex items-center gap-2">
+            {onPickContact ? (
+              <ContactPicker
+                contacts={contacts}
+                disabled={disabled}
+                label={`copy recipient ${position}`}
+                onPick={onPickContact}
+              />
+            ) : null}
+            <button
+              aria-label={`Remove copy recipient ${position}`}
+              className="btn-quiet btn-quiet-danger"
+              disabled={disabled}
+              onClick={onRemove}
+              type="button"
+            >
+              Remove
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-x-4 gap-y-1 md:grid-cols-2">
@@ -783,11 +816,13 @@ function CopyRecipientCard({
 }
 
 export function SignersShell({
+  contacts = [],
   envelopeId,
   initialState,
   record,
 }: SignersShellProps) {
   const initialModel = buildInitialModel(record);
+  const [rememberPeople, setRememberPeople] = useState(true);
   const [signers, setSigners] = useState(initialModel.signers);
   const [copyRecipients, setCopyRecipients] = useState(
     initialModel.copyRecipients,
@@ -1032,6 +1067,20 @@ export function SignersShell({
         return;
       }
 
+      if (rememberPeople) {
+        // Best effort: a contact that fails to save never holds up sending.
+        await fetch("/api/contacts", {
+          body: JSON.stringify({
+            contacts: [...signers, ...copyRecipients].map((person) => ({
+              email: person.email.trim(),
+              name: person.name.trim(),
+            })),
+          }),
+          headers: { "content-type": "application/json" },
+          method: "POST",
+        }).catch(() => null);
+      }
+
       window.location.assign(
         payload.data?.redirectPath ?? `/envelopes/${envelopeId}/prepare`,
       );
@@ -1116,6 +1165,13 @@ export function SignersShell({
                   index={index}
                   key={signer.localId}
                   nameError={nameError}
+                  contacts={contacts}
+                  onPickContact={(contact) => {
+                    handleSignerChange(signer.localId, "name", contact.name);
+                    handleSignerChange(signer.localId, "email", contact.email);
+                    handleSignerBlur(signer.localId, "name");
+                    handleSignerBlur(signer.localId, "email");
+                  }}
                   onChange={(field, value) =>
                     handleSignerChange(signer.localId, field, value)
                   }
@@ -1186,6 +1242,15 @@ export function SignersShell({
 
                   return (
                     <CopyRecipientCard
+                      contacts={contacts}
+                      onPickContact={(contact) => {
+                        handleCopyRecipientChange(recipient.localId, {
+                          email: contact.email,
+                          name: contact.name,
+                        });
+                        handleCopyRecipientBlur(recipient.localId, "name");
+                        handleCopyRecipientBlur(recipient.localId, "email");
+                      }}
                       disabled={isSubmitting}
                       emailError={
                         showAllErrors || recipient.touched.email
@@ -1233,6 +1298,19 @@ export function SignersShell({
               ) : null}
             </div>
           </div>
+
+          <label className="flex items-center gap-2 text-[0.8125rem] font-semibold text-(--secondary)">
+            <input
+              checked={rememberPeople}
+              className="size-4 shrink-0 cursor-pointer accent-(--accent)"
+              disabled={isSubmitting}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setRememberPeople(event.target.checked)
+              }
+              type="checkbox"
+            />
+            Save new people to my contacts
+          </label>
 
           <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             {/* The document is part of the draft and is not uploaded again,

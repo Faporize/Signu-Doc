@@ -474,7 +474,7 @@ test("what a template is given is checked", async () => {
     use({
       signers: [
         { email: "a@example.test", name: "A" },
-        { email: "A@example.test", name: "B" },
+        { email: "A@example.test", name: " a " },
       ],
       title: "Lease",
     }),

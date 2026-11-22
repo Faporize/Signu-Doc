@@ -8,6 +8,18 @@ release says when it does.
 
 ## [Unreleased]
 
+### Added
+
+- A Contacts page keeps the names and emails of people a sender sends to
+  often. On the signers step, each signer and copy recipient has a Contacts
+  button that fills in their name and email, and a tick, on by default, saves
+  new people to the list when the step is continued.
+- Two signers of one envelope may now share an email address when their
+  names differ (a couple on one inbox, an agent signing for two clients).
+  The same name and address twice is still refused, and so are shared
+  addresses in Part 11 mode, where a signature belongs to an account. This
+  needs a migration, which replaces the one-email-per-envelope index.
+
 ### Settings
 
 - An administrator can write the disclosure signers read and agree to before

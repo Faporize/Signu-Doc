@@ -19,6 +19,7 @@ import {
   reminderIntervalDaysSchema,
 } from "../schemas/envelope.ts";
 import { fieldTypeSchema } from "../schemas/field.ts";
+import { signerKey } from "../schemas/signer.ts";
 import {
   MAX_COPY_RECIPIENTS_PER_ENVELOPE,
   MAX_SIGNERS_CEILING,
@@ -245,12 +246,12 @@ export async function createEnvelopeForApi(
       database,
     );
     const idByEmail = new Map(
-      signers.signers.map((signer) => [signer.email.toLowerCase(), signer.id]),
+      signers.signers.map((signer) => [signerKey(signer), signer.id]),
     );
     const idByRef = new Map<string, string>();
 
     for (const signer of input.signers) {
-      const id = idByEmail.get(signer.email.toLowerCase());
+      const id = idByEmail.get(signerKey(signer));
 
       if (!id) {
         throw new Error("A signer that was just saved could not be found.");

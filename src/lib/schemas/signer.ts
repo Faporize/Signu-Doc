@@ -16,7 +16,19 @@ import {
 
 export const signerStatusSchema = z.enum(signerStatuses);
 export const duplicateSignerEmailMessage =
-  "Each signer must have a unique email address.";
+  "This name and email address are already listed. To list one email address twice, give each person a different name.";
+
+/**
+ * Who a signer is within an envelope: their email address and their name.
+ * Two signers may share an email address (a couple on one inbox, an agent
+ * signing for two clients) as long as their names differ.
+ */
+export function signerKey(signer: { email: string; name: string }): string {
+  return `${signer.email.trim().toLowerCase()}\n${signer.name
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase()}`;
+}
 export const duplicateCopyRecipientEmailMessage =
   "This address is already a signer or a copy recipient.";
 
@@ -63,7 +75,7 @@ export const signerListSchema = z
     const signOrders = new Set<number>();
 
     for (const [index, signer] of signers.entries()) {
-      const normalizedEmail = signer.email.toLowerCase();
+      const normalizedEmail = signerKey(signer);
 
       if (emails.has(normalizedEmail)) {
         ctx.addIssue({

@@ -3,7 +3,7 @@ import {
   envelopeTitleSchema,
   nameSchema,
 } from "./schemas/common.ts";
-import { duplicateSignerEmailMessage } from "./schemas/signer.ts";
+import { duplicateSignerEmailMessage, signerKey } from "./schemas/signer.ts";
 
 // CSV for sending one template to many people: a header that names the
 // template's signer roles, then one envelope per row. The parser is small
@@ -431,7 +431,9 @@ function firstSignerProblem(
 
     const email = addressed.data.toLowerCase();
 
-    if (emails.has(email)) {
+    const key = signerKey({ email, name: signer.name });
+
+    if (emails.has(key)) {
       return duplicateSignerEmailMessage;
     }
 
@@ -439,7 +441,7 @@ function firstSignerProblem(
       return "This address is already a signer or a copy recipient.";
     }
 
-    emails.add(email);
+    emails.add(key);
   }
 
   return null;
