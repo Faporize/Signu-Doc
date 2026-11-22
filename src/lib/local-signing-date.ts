@@ -20,3 +20,32 @@ export function formatLocalSigningDate(
     year: "numeric",
   }).format(localDateTime);
 }
+
+/** The widest offsets a device can report: UTC-14:00 to UTC+14:00, in minutes. */
+const MAX_OFFSET_MINUTES = 14 * 60;
+
+/**
+ * The same day, or null when the moment or the offset cannot give a real one.
+ * The signed PDF uses this, so a value that was stored in an odd shape can
+ * only leave a signature without its date, never stop the document being made.
+ */
+export function formatLocalSigningDateSafely(
+  submittedAt: unknown,
+  timezoneOffsetMinutes: unknown,
+): string | null {
+  if (
+    typeof submittedAt !== "number" ||
+    !Number.isFinite(submittedAt) ||
+    typeof timezoneOffsetMinutes !== "number" ||
+    !Number.isInteger(timezoneOffsetMinutes) ||
+    Math.abs(timezoneOffsetMinutes) > MAX_OFFSET_MINUTES
+  ) {
+    return null;
+  }
+
+  try {
+    return formatLocalSigningDate(submittedAt, timezoneOffsetMinutes);
+  } catch {
+    return null;
+  }
+}

@@ -9,7 +9,7 @@ import {
 } from "../schemas/envelope.ts";
 import type { FieldRecord } from "../schemas/field.ts";
 import type { SignerRecord } from "../schemas/signer.ts";
-import { formatLocalSigningDate } from "../local-signing-date.ts";
+import { formatLocalSigningDateSafely } from "../local-signing-date.ts";
 import {
   chooseSignatureDateLayout,
   splitSignatureBox,
@@ -1819,19 +1819,23 @@ export async function renderFinalizedEnvelopePdf(
   const signatureDates = new Map<string, string>();
 
   for (const field of stampedFields) {
-    const offset = signerClockOffsets.get(field.signerId);
-
+    // A Part 11 signature already carries its own time and meaning beside it.
     if (
-      field.id !== undefined &&
-      field.type === "signature" &&
-      typeof field.submittedAt === "number" &&
-      offset !== undefined &&
-      !pagesWithOwnDate.has(`${field.signerId}:${String(field.page)}`)
+      field.id === undefined ||
+      field.type !== "signature" ||
+      manifestations.has(field.signerId) ||
+      pagesWithOwnDate.has(`${field.signerId}:${String(field.page)}`)
     ) {
-      signatureDates.set(
-        field.id,
-        formatLocalSigningDate(field.submittedAt, offset),
-      );
+      continue;
+    }
+
+    const day = formatLocalSigningDateSafely(
+      field.submittedAt,
+      signerClockOffsets.get(field.signerId),
+    );
+
+    if (day) {
+      signatureDates.set(field.id, day);
     }
   }
 

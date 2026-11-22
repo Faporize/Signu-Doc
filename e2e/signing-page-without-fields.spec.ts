@@ -78,7 +78,9 @@ test("a page with no fields for the signer stays readable", async ({
     // The page opens on the signer's field, and the only controls are the
     // page switcher and the Start and Finish buttons at the bottom.
     await expect(signerPage.getByText("Page 2 of 2")).toBeVisible();
-    await expect(signerPage.getByRole("button", { name: "Start" })).toBeVisible();
+    await expect(
+      signerPage.getByRole("button", { name: "Start" }),
+    ).toBeVisible();
 
     await signerPage.getByRole("button", { name: "Previous page" }).click();
     await expect(signerPage.getByText("Page 1 of 2")).toBeVisible();

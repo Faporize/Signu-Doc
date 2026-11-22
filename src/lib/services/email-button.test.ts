@@ -96,3 +96,18 @@ test("the invitation email ends with who sent it", () => {
   assert.match(message.textBody, /Sent by Deion Au$/);
   assert.ok(!message.textBody.includes("using"));
 });
+
+test("a link that is not a web link makes no button", () => {
+  for (const url of [
+    "javascript:alert(1)",
+    "data:text/html,<p>x</p>",
+    "//evil.example/x",
+    "",
+  ]) {
+    assert.equal(
+      buildEmailButton({ branding, label: "Review and sign", url }),
+      "",
+      url,
+    );
+  }
+});
