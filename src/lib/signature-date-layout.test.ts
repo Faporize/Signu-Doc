@@ -47,10 +47,28 @@ test("a box with room puts the date underneath, however wide it is", () => {
   );
 });
 
-test("a box too short or too narrow for both gets no date", () => {
-  assert.equal(chooseSignatureDateLayout({ heightPt: 24, widthPt: 300 }), null);
-  assert.equal(chooseSignatureDateLayout({ heightPt: 40, widthPt: 40 }), null);
+test("a small box still carries the date, which shrinks to fit", () => {
+  assert.equal(
+    chooseSignatureDateLayout({ heightPt: 24, widthPt: 300 }),
+    "below",
+  );
+  assert.equal(
+    chooseSignatureDateLayout({ heightPt: 40, widthPt: 40 }),
+    "below",
+  );
+  assert.equal(
+    chooseSignatureDateLayout({ heightPt: 6, widthPt: 20 }),
+    "below",
+  );
+});
+
+test("only a box with no area, or a broken one, has no date", () => {
   assert.equal(chooseSignatureDateLayout({ heightPt: 0, widthPt: 0 }), null);
+  assert.equal(chooseSignatureDateLayout({ heightPt: 40, widthPt: 0 }), null);
+  assert.equal(
+    chooseSignatureDateLayout({ heightPt: Number.NaN, widthPt: 90 }),
+    null,
+  );
 });
 
 test("the date's part sits under the signature's part and they fill the box", () => {

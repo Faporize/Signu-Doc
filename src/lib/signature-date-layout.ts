@@ -1,8 +1,9 @@
 // Where the date goes inside a signature box. A signature is stamped with the
 // day it was signed, so the sender need not place a separate date field. The
-// date sits underneath the signature, inside the signature's own box, and is
-// left out when the box is too short to hold both. The signed PDF and the
-// signing page use the same rules, so the preview matches the document.
+// date sits underneath the signature, inside the signature's own box, at any
+// size of box: both texts shrink to fit instead of the date being dropped.
+// The signed PDF and the signing page use the same rules, so the preview
+// matches the document.
 
 export type SignatureDateLayout = "below";
 
@@ -18,8 +19,9 @@ export type SignatureBox = {
 export const SIGNATURE_DATE_BELOW_SHARE = 0.3;
 
 /**
- * Whether a box of this size in points has room for a date underneath, however
- * wide it is. A box too short for both gets no date.
+ * Whether a box has a date underneath. Every box does, whatever its size: the
+ * date is drawn in whatever part of the box is left for it, at a size that
+ * fits. Only a box with no area at all (a corrupt field) has none.
  */
 export function chooseSignatureDateLayout(size: {
   heightPt: number;
@@ -27,7 +29,12 @@ export function chooseSignatureDateLayout(size: {
 }): SignatureDateLayout | null {
   const { heightPt, widthPt } = size;
 
-  return heightPt >= 28 && widthPt >= 50 ? "below" : null;
+  return Number.isFinite(heightPt) &&
+    Number.isFinite(widthPt) &&
+    heightPt > 0 &&
+    widthPt > 0
+    ? "below"
+    : null;
 }
 
 /** The signature's part of the box and the date's part, under it. */

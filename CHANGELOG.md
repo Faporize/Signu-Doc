@@ -8,6 +8,13 @@ release says when it does.
 
 ## [Unreleased]
 
+### Changed
+
+- A signature always carries the day it was signed, under the signature, at
+  any size of box: both shrink to fit instead of the date being left out.
+  A separate Date field on the page no longer removes it. Part 11
+  signatures still show their own meaning and time instead.
+
 ### Added
 
 - A Contacts page keeps the names and emails of people a sender sends to
