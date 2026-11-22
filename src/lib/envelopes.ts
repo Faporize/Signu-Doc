@@ -2816,7 +2816,22 @@ export async function sendDraftEnvelope(
       database,
     );
 
+    const seenEmails = new Set<string>();
+
     for (const signer of signers) {
+      const emailKey = signer.email.toLowerCase();
+
+      // A Part 11 signature belongs to one account, which an email address
+      // names. Two signers on one address would be one person signing twice.
+      if (seenEmails.has(emailKey)) {
+        throw new EnvelopeMutationError(
+          "In Part 11 mode each signer signs from their own account, so two signers cannot share an email address.",
+          400,
+        );
+      }
+
+      seenEmails.add(emailKey);
+
       const account = accounts.get(signer.email.toLowerCase());
       const problem = describePart11SignerProblem(
         {
@@ -3588,8 +3603,17 @@ export async function correctSentEnvelopeSigner(
         WHERE envelope_id = $1
           AND lower(email) = $2
           AND id <> $3
+          AND (
+            role = 'cc'
+            OR lower(regexp_replace(btrim(name), '\\s+', ' ', 'g')) = $4
+          )
       `,
-      [envelopeId, nextEmail.toLowerCase(), signerId],
+      [
+        envelopeId,
+        nextEmail.toLowerCase(),
+        signerId,
+        nextName.trim().replace(/\s+/g, " ").toLowerCase(),
+      ],
     );
 
     if (duplicate) {

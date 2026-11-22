@@ -243,7 +243,7 @@ test("a missing name, a bad email, a duplicate row and a duplicate address are s
 
   const sameRow = validateBulkSendRows(
     parseBulkSendCsv(
-      "Tenant name,Tenant email,Landlord name,Landlord email\nA,a@example.test,B,A@example.test\n",
+      "Tenant name,Tenant email,Landlord name,Landlord email\nA,a@example.test,a,A@example.test\n",
       twoRoles,
       "Lease",
     ).rows,
@@ -251,6 +251,16 @@ test("a missing name, a bad email, a duplicate row and a duplicate address are s
 
   assert.equal(sameRow[0]?.status, "skipped");
   assert.equal(sameRow[0]?.reason, duplicateSignerEmailMessage);
+
+  const sharedAddress = validateBulkSendRows(
+    parseBulkSendCsv(
+      "Tenant name,Tenant email,Landlord name,Landlord email\nA,a@example.test,B,A@example.test\n",
+      twoRoles,
+      "Lease",
+    ).rows,
+  );
+
+  assert.equal(sharedAddress[0]?.status, "ok");
 });
 
 test("a title that is too long is skipped, and a copy recipient's address cannot also sign", () => {
