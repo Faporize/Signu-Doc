@@ -1116,15 +1116,7 @@ export function SigningLiveShell({
                         checkboxValue={Boolean(checkboxValues[field.id])}
                         field={field}
                         key={field.id}
-                        dateOnSignature={
-                          record.currentSignerFields.some(
-                            (other) =>
-                              other.type === "date" &&
-                              other.page === field.page,
-                          )
-                            ? null
-                            : localDateLabel
-                        }
+                        dateOnSignature={localDateLabel}
                         localDateLabel={localDateLabel}
                         pageSizePt={
                           activePageRecord

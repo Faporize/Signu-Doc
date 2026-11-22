@@ -1146,7 +1146,7 @@ test("a signature is stamped alone when the signer's clock is not known", async 
   assert.doesNotMatch(text, /January 1[45], 2027/);
 });
 
-test("a signer who placed their own date field gets no second date", async () => {
+test("a signature carries its day even when a date field is also placed", async () => {
   const fixture = await makeFixture();
   const withDateField: FieldRecord[] = [
     ...fixture.fields,
@@ -1165,7 +1165,20 @@ test("a signer who placed their own date field gets no second date", async () =>
   });
 
   assert.ok(text.includes("March 3, 2027"));
-  assert.ok(!text.includes("January 14, 2027"));
+  assert.ok(text.includes("January 14, 2027"));
+});
+
+test("a small signature box still carries the day, in a smaller size", async () => {
+  const fixture = await makeFixture();
+  const small: FieldRecord[] = fixture.fields.map((field) =>
+    field.type === "signature" ? { ...field, height: 0.02, width: 0.1 } : field,
+  );
+  const text = await renderSigned(fixture, {
+    auditEvents: withClockOffset(fixture.auditEvents, 480),
+    fields: small,
+  });
+
+  assert.ok(text.includes("January 14, 2027"));
 });
 
 test("a Part 11 signature, which already prints its own time, gets no extra date", async () => {

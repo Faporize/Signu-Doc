@@ -730,15 +730,17 @@ function drawSignatureDate(
   box: SignatureBox,
   padding: number,
 ) {
-  const maxWidth = Math.max(4, box.width - padding * 2);
-  const maxHeight = Math.max(4, box.height - padding);
-  const size = fitTextSize(
-    font,
-    label,
-    maxWidth,
-    maxHeight,
-    Math.min(maxHeight * 0.8, 9),
-  );
+  // The date takes whatever room is left, at any size: it shrinks until it
+  // fits, past the floor other text keeps, rather than being left out.
+  const maxWidth = Math.max(1, box.width - padding * 2);
+  const maxHeight = Math.max(1, box.height - padding);
+  let size = Math.min(maxHeight * 0.8, 9);
+
+  while (size > 1 && font.widthOfTextAtSize(label, size) > maxWidth) {
+    size -= 0.25;
+  }
+
+  size = Math.max(1, size);
 
   font.drawText(page, label, {
     color: rgb(0.32, 0.32, 0.38),
@@ -1811,11 +1813,6 @@ export async function renderFinalizedEnvelopePdf(
     }
   }
 
-  const pagesWithOwnDate = new Set(
-    input.fields
-      .filter((field) => field.type === "date")
-      .map((field) => `${field.signerId}:${String(field.page)}`),
-  );
   const signatureDates = new Map<string, string>();
 
   for (const field of stampedFields) {
@@ -1823,8 +1820,7 @@ export async function renderFinalizedEnvelopePdf(
     if (
       field.id === undefined ||
       field.type !== "signature" ||
-      manifestations.has(field.signerId) ||
-      pagesWithOwnDate.has(`${field.signerId}:${String(field.page)}`)
+      manifestations.has(field.signerId)
     ) {
       continue;
     }
