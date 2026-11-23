@@ -21,6 +21,33 @@ export function formatLocalSigningDate(
   }).format(localDateTime);
 }
 
+/**
+ * The day and time on the signer's own clock when they signed, such as
+ * "11/22/26 10:07:14 PM". It goes under a signature. Like the date alone it
+ * is the signer's local time, with no time zone written next to it.
+ */
+export function formatLocalSigningTimestamp(
+  submittedAt: number,
+  timezoneOffsetMinutes: number,
+): string {
+  const localDateTime = new Date(
+    submittedAt * 1000 - timezoneOffsetMinutes * 60 * 1000,
+  );
+
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    hour: "numeric",
+    hour12: true,
+    minute: "2-digit",
+    month: "numeric",
+    second: "2-digit",
+    timeZone: "UTC",
+    year: "2-digit",
+  })
+    .format(localDateTime)
+    .replace(", ", " ");
+}
+
 /** The widest offsets a device can report: UTC-14:00 to UTC+14:00, in minutes. */
 const MAX_OFFSET_MINUTES = 14 * 60;
 
@@ -45,6 +72,27 @@ export function formatLocalSigningDateSafely(
 
   try {
     return formatLocalSigningDate(submittedAt, timezoneOffsetMinutes);
+  } catch {
+    return null;
+  }
+}
+
+/** The same check for the day and time under a signature. */
+export function formatLocalSigningTimestampSafely(
+  submittedAt: unknown,
+  timezoneOffsetMinutes: unknown,
+): string | null {
+  if (
+    formatLocalSigningDateSafely(submittedAt, timezoneOffsetMinutes) === null
+  ) {
+    return null;
+  }
+
+  try {
+    return formatLocalSigningTimestamp(
+      submittedAt as number,
+      timezoneOffsetMinutes as number,
+    );
   } catch {
     return null;
   }

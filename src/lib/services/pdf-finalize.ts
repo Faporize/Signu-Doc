@@ -9,7 +9,7 @@ import {
 } from "../schemas/envelope.ts";
 import type { FieldRecord } from "../schemas/field.ts";
 import type { SignerRecord } from "../schemas/signer.ts";
-import { formatLocalSigningDateSafely } from "../local-signing-date.ts";
+import { formatLocalSigningTimestampSafely } from "../local-signing-date.ts";
 import {
   chooseSignatureDateLayout,
   splitSignatureBox,
@@ -1795,9 +1795,8 @@ export async function renderFinalizedEnvelopePdf(
       }
     }
   }
-  // Each signature is stamped with the day the signer signed, on the signer's
-  // own clock, which their device reported when they signed. A signer who
-  // placed a date field themselves on that page gets no second one.
+  // Each signature is stamped with the day and time the signer signed, on the
+  // signer's own clock, which their device reported when they signed.
   const signerClockOffsets = new Map<string, number>();
 
   for (const event of input.auditEvents) {
@@ -1825,7 +1824,7 @@ export async function renderFinalizedEnvelopePdf(
       continue;
     }
 
-    const day = formatLocalSigningDateSafely(
+    const day = formatLocalSigningTimestampSafely(
       field.submittedAt,
       signerClockOffsets.get(field.signerId),
     );

@@ -10,6 +10,17 @@ release says when it does.
 
 ### Changed
 
+- The field tools no longer offer a separate Date field: a Signature field
+  carries the date and time. Date fields already placed in a draft, a
+  template or by the API keep working.
+
+- Under a signature goes the day and time on the signer's own clock, such as
+  "11/22/26 10:07:14 PM", with no time zone. It was the date alone.
+- On a computer, the signing controls float at the bottom of the screen as a
+  bar (Previous, Next or Start, Finish) with a count of what is left at the
+  top right, and finishing shows a short "Document signed" confirmation.
+  Phones keep the full-width bar.
+
 - A signature always carries the day it was signed, under the signature, at
   any size of box: both shrink to fit instead of the date being left out.
   A separate Date field on the page no longer removes it. Part 11

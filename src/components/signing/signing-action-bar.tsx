@@ -59,92 +59,104 @@ export function SigningActionBar({
     : status;
 
   return (
-    <div
-      aria-label="Signing controls"
-      role="region"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md"
-    >
-      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-3">
-        {alerts.length > 0 ? (
-          <div className="grid gap-1" role="alert">
-            {alerts.map((alert) => (
-              <p
-                className="text-[0.8125rem] font-semibold leading-5 text-(--danger)"
-                key={alert}
+    <>
+      {/* On a computer the count of what is left sits at the top right. */}
+      {remaining > 0 ? (
+        <p className="pointer-events-none fixed right-5 top-[5.25rem] z-30 hidden items-center gap-2 rounded-lg border border-(--border-strong) bg-white/95 px-3 py-1.5 text-[0.8125rem] font-semibold text-(--secondary) shadow-sm md:flex">
+          To go
+          <span className="inline-flex min-w-6 justify-center rounded-md bg-(--accent) px-1.5 py-0.5 text-xs font-bold text-white">
+            {remaining}
+          </span>
+        </p>
+      ) : null}
+
+      <div
+        aria-label="Signing controls"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2 md:rounded-2xl md:border-0 md:bg-[#2f3640] md:p-2 md:text-white md:shadow-[0_12px_40px_rgba(15,23,42,0.35)]"
+        role="region"
+      >
+        <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-3 md:max-w-none md:flex-row md:items-center md:gap-3 md:p-0">
+          {alerts.length > 0 ? (
+            <div className="grid gap-1 md:basis-full" role="alert">
+              {alerts.map((alert) => (
+                <p
+                  className="text-[0.8125rem] font-semibold leading-5 text-(--danger) md:text-[#ffb4b4]"
+                  key={alert}
+                >
+                  {alert}
+                </p>
+              ))}
+            </div>
+          ) : null}
+
+          {pages ? (
+            <div className="flex items-center justify-center gap-2">
+              <button
+                aria-label="Previous page"
+                className="btn-quiet size-9 px-0 pointer-coarse:size-11 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
+                disabled={pages.active === 1}
+                onClick={pages.onPrevious}
+                type="button"
               >
-                {alert}
+                <ChevronLeftIcon className="size-4" />
+              </button>
+              <p className="min-w-[6.5rem] text-center text-[0.8125rem] font-bold text-(--secondary) md:min-w-0 md:text-white/80">
+                {`Page ${pages.active} of ${pages.count}`}
               </p>
-            ))}
-          </div>
-        ) : null}
+              <button
+                aria-label="Next page"
+                className="btn-quiet size-9 px-0 pointer-coarse:size-11 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
+                disabled={pages.active === pages.count}
+                onClick={pages.onNext}
+                type="button"
+              >
+                <ChevronRightIcon className="size-4" />
+              </button>
+            </div>
+          ) : null}
 
-        {pages ? (
-          <div className="flex items-center justify-center gap-2">
-            <button
-              aria-label="Previous page"
-              className="btn-quiet size-9 px-0 pointer-coarse:size-11"
-              disabled={pages.active === 1}
-              onClick={pages.onPrevious}
-              type="button"
+          {hasSteps || remaining > 0 ? (
+            <p
+              aria-live="polite"
+              className="text-center text-[0.8125rem] font-semibold text-(--secondary) md:max-w-72 md:text-left md:text-white/80"
             >
-              <ChevronLeftIcon className="size-4" />
-            </button>
-            <p className="min-w-[6.5rem] text-center text-[0.8125rem] font-bold text-(--secondary)">
-              {`Page ${pages.active} of ${pages.count}`}
+              {caption}
             </p>
-            <button
-              aria-label="Next page"
-              className="btn-quiet size-9 px-0 pointer-coarse:size-11"
-              disabled={pages.active === pages.count}
-              onClick={pages.onNext}
-              type="button"
+          ) : null}
+
+          <div className="flex items-stretch gap-2">
+            {isStarted ? (
+              <ShellButton
+                className="min-h-12 w-12 shrink-0 px-0"
+                onClick={onPrevious}
+                variant="secondary"
+              >
+                <ChevronLeftIcon aria-hidden="true" className="size-5" />
+                <span className="sr-only">Previous</span>
+              </ShellButton>
+            ) : null}
+
+            {hasSteps ? (
+              <ShellButton
+                className="min-h-12 flex-1 md:min-w-28"
+                onClick={isStarted ? onNext : onStart}
+                variant={finishIsPrimary ? "secondary" : "primary"}
+              >
+                {isStarted ? "Next" : "Start"}
+              </ShellButton>
+            ) : null}
+
+            <ShellButton
+              className="min-h-12 flex-1 md:min-w-28"
+              disabled={finishDisabled}
+              onClick={onFinish}
+              variant={finishIsPrimary ? "primary" : "secondary"}
             >
-              <ChevronRightIcon className="size-4" />
-            </button>
+              Finish
+            </ShellButton>
           </div>
-        ) : null}
-
-        {hasSteps || remaining > 0 ? (
-          <p
-            aria-live="polite"
-            className="text-center text-[0.8125rem] font-semibold text-(--secondary)"
-          >
-            {caption}
-          </p>
-        ) : null}
-
-        <div className="flex items-stretch gap-2">
-          {isStarted ? (
-            <ShellButton
-              className="min-h-12 w-12 shrink-0 px-0"
-              onClick={onPrevious}
-              variant="secondary"
-            >
-              <ChevronLeftIcon aria-hidden="true" className="size-5" />
-              <span className="sr-only">Previous</span>
-            </ShellButton>
-          ) : null}
-
-          {hasSteps ? (
-            <ShellButton
-              className="min-h-12 flex-1"
-              onClick={isStarted ? onNext : onStart}
-              variant={finishIsPrimary ? "secondary" : "primary"}
-            >
-              {isStarted ? "Next" : "Start"}
-            </ShellButton>
-          ) : null}
-
-          <ShellButton
-            className="min-h-12 flex-1"
-            disabled={finishDisabled}
-            onClick={onFinish}
-            variant={finishIsPrimary ? "primary" : "secondary"}
-          >
-            Finish
-          </ShellButton>
         </div>
       </div>
-    </div>
+    </>
   );
 }
