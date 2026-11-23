@@ -4,6 +4,8 @@ import { test } from "node:test";
 import {
   formatLocalSigningDate,
   formatLocalSigningDateSafely,
+  formatLocalSigningTimestamp,
+  formatLocalSigningTimestampSafely,
 } from "./local-signing-date.ts";
 import {
   chooseSignatureDateLayout,
@@ -109,4 +111,22 @@ test("an odd stored value leaves out the date instead of throwing", () => {
       `${String(moment)} / ${String(offset)}`,
     );
   }
+});
+
+test("the stamp under a signature is the signer's own day and time, with no zone", () => {
+  // 7:58:20 am on 15 January in UTC is the evening of the 14th in California.
+  const moment = 1_799_999_900;
+
+  assert.equal(formatLocalSigningTimestamp(moment, 480), "1/14/27 11:58:20 PM");
+  assert.equal(formatLocalSigningTimestamp(moment, 0), "1/15/27 7:58:20 AM");
+  assert.doesNotMatch(
+    formatLocalSigningTimestamp(moment, 480),
+    /UTC|GMT|EST|PST|CST|MST|,/,
+  );
+  assert.equal(
+    formatLocalSigningTimestampSafely(moment, 480),
+    "1/14/27 11:58:20 PM",
+  );
+  assert.equal(formatLocalSigningTimestampSafely(moment, 1e12), null);
+  assert.equal(formatLocalSigningTimestampSafely(moment, undefined), null);
 });

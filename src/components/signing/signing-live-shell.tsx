@@ -57,12 +57,15 @@ import {
   stepBefore,
 } from "@/lib/signing-guide";
 import { truncateToWholeCharacters } from "@/lib/text-truncate";
+import { formatLocalSigningTimestamp } from "@/lib/local-signing-date";
 import { postToEmbedParent } from "./embed-parent-message";
 
 const typedSignatureFont =
   '"Snell Roundhand", "Brush Script MT", "Segoe Script", cursive';
 
 type SignatureEntry = {
+  /** When it was applied (ms), for the day and time under the signature. */
+  appliedAt?: number;
   imageDataUrl?: string | null;
   inputMethod: "drawn" | "typed";
   value: string;
@@ -98,6 +101,18 @@ export const declinedConfirmation = {
 };
 const compactFieldHeightThreshold = 0.045;
 const compactFieldWidthThreshold = 0.12;
+
+/** The day and time under a signature on the page, on this device's own clock. */
+function signatureTimestampLabel(entry?: SignatureEntry): string | null {
+  if (!entry?.appliedAt) {
+    return null;
+  }
+
+  return formatLocalSigningTimestamp(
+    entry.appliedAt / 1000,
+    new Date(entry.appliedAt).getTimezoneOffset(),
+  );
+}
 
 function getSignerInitials(name: string): string {
   return getInitials(name, { max: 4 });
@@ -740,7 +755,7 @@ export function SigningLiveShell({
     if (!existingFieldEntry && reusableEntry) {
       setSignatureValues((current) => ({
         ...current,
-        [field.id]: reusableEntry,
+        [field.id]: { ...reusableEntry, appliedAt: Date.now() },
       }));
       return;
     }
@@ -1116,7 +1131,9 @@ export function SigningLiveShell({
                         checkboxValue={Boolean(checkboxValues[field.id])}
                         field={field}
                         key={field.id}
-                        dateOnSignature={localDateLabel}
+                        dateOnSignature={signatureTimestampLabel(
+                          signatureValues[field.id],
+                        )}
                         localDateLabel={localDateLabel}
                         pageSizePt={
                           activePageRecord
@@ -1251,7 +1268,7 @@ export function SigningLiveShell({
             }));
             setSignatureValues((current) => ({
               ...current,
-              [signatureModal.fieldId]: entry,
+              [signatureModal.fieldId]: { ...entry, appliedAt: Date.now() },
             }));
             setSubmitError(null);
             setSignatureModal(null);

@@ -9,7 +9,7 @@ import {
 } from "../schemas/envelope.ts";
 import type { FieldRecord } from "../schemas/field.ts";
 import type { SignerRecord } from "../schemas/signer.ts";
-import { formatLocalSigningDateSafely } from "../local-signing-date.ts";
+import { formatLocalSigningTimestampSafely } from "../local-signing-date.ts";
 import {
   chooseSignatureDateLayout,
   splitSignatureBox,
@@ -1825,7 +1825,7 @@ export async function renderFinalizedEnvelopePdf(
       continue;
     }
 
-    const day = formatLocalSigningDateSafely(
+    const day = formatLocalSigningTimestampSafely(
       field.submittedAt,
       signerClockOffsets.get(field.signerId),
     );

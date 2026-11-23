@@ -1131,11 +1131,11 @@ test("a signature is stamped with the day on the signer's own clock", async () =
     auditEvents: withClockOffset(fixture.auditEvents, 0),
   });
 
-  assert.ok(californian.includes("January 14, 2027"));
-  assert.ok(!californian.includes("January 15, 2027"));
-  assert.ok(utc.includes("January 15, 2027"));
+  assert.ok(californian.includes("1/14/27 11:58:20 PM"));
+  assert.ok(!californian.includes("1/15/27 7:58:20 AM"));
+  assert.ok(utc.includes("1/15/27 7:58:20 AM"));
   // No time zone is written next to it.
-  assert.doesNotMatch(californian, /January 14, 2027 ?(UTC|GMT|PST|PT)/);
+  assert.doesNotMatch(californian, /1\/14\/27 11:58:20 PM ?(UTC|GMT|PST|PT)/);
 });
 
 test("a signature is stamped alone when the signer's clock is not known", async () => {
@@ -1143,7 +1143,7 @@ test("a signature is stamped alone when the signer's clock is not known", async 
   const text = await renderSigned(fixture);
 
   assert.ok(text.includes(SIGNER_NAME));
-  assert.doesNotMatch(text, /January 1[45], 2027/);
+  assert.doesNotMatch(text, /1\/1[45]\/27/);
 });
 
 test("a signature carries its day even when a date field is also placed", async () => {
@@ -1165,7 +1165,7 @@ test("a signature carries its day even when a date field is also placed", async 
   });
 
   assert.ok(text.includes("March 3, 2027"));
-  assert.ok(text.includes("January 14, 2027"));
+  assert.ok(text.includes("1/14/27 11:58:20 PM"));
 });
 
 test("a small signature box still carries the day, in a smaller size", async () => {
@@ -1178,7 +1178,7 @@ test("a small signature box still carries the day, in a smaller size", async () 
     fields: small,
   });
 
-  assert.ok(text.includes("January 14, 2027"));
+  assert.ok(text.includes("1/14/27 11:58:20 PM"));
 });
 
 test("a Part 11 signature, which already prints its own time, gets no extra date", async () => {
@@ -1196,7 +1196,7 @@ test("a Part 11 signature, which already prints its own time, gets no extra date
   });
 
   assert.ok(text.includes("Meaning: Approval"));
-  assert.ok(!text.includes("January 14, 2027"));
+  assert.ok(!text.includes("1/14/27 11:58:20 PM"));
 });
 
 test("a stored clock value that is not a real offset still gives a signed document", async () => {
@@ -1206,5 +1206,5 @@ test("a stored clock value that is not a real offset still gives a signed docume
   });
 
   assert.ok(text.includes(SIGNER_NAME));
-  assert.doesNotMatch(text, /January 1[45], 2027/);
+  assert.doesNotMatch(text, /1\/1[45]\/27/);
 });

@@ -1,6 +1,8 @@
 import { Brand } from "@/components/layout/brand";
 import { PublicLegalFooter } from "@/components/layout/public-legal-links";
 
+import { SigningDoneToast } from "./signing-done-toast";
+
 const fallbackEnvelopeTitle = "this document";
 
 type SigningDoneShellProps = {
@@ -73,6 +75,7 @@ export function SigningDoneShell({
         </section>
       </main>
 
+      <SigningDoneToast />
       <PublicLegalFooter />
     </div>
   );
