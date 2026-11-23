@@ -1558,8 +1558,8 @@ function CurrentSignerField({
   activation?: { fieldId: string; nonce: number } | null;
   checkboxValue: boolean;
   /**
-   * The day to show under a signature once it is signed.
-   * Null when the signer has a date field of their own on the page.
+   * The day and time to show under a signature once it is signed. Null
+   * until the signature has been applied.
    */
   dateOnSignature?: string | null;
   field: SigningCurrentField;

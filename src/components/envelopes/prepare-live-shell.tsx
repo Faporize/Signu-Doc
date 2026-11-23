@@ -105,6 +105,8 @@ type PrepareShellSigner = {
 };
 
 type FieldTool = {
+  /** A few words shown beside the label, saying more of what the field does. */
+  hint?: string;
   defaultHeight: number;
   defaultWidth: number;
   label: string;
@@ -150,6 +152,7 @@ const fieldTools: readonly FieldTool[] = [
   {
     defaultHeight: 0.07,
     defaultWidth: 0.24,
+    hint: "Includes the date",
     label: "Signature",
     minHeight: 0.0045,
     minWidth: 0.006,
@@ -230,6 +233,11 @@ const fieldTools: readonly FieldTool[] = [
     type: "radio",
   },
 ] as const;
+
+// A signature carries the day and time it was signed, so a separate Date
+// field is no longer offered. One already placed (a draft or template made
+// earlier) keeps working, which is why it stays in the list above.
+const paletteTools = fieldTools.filter((tool) => tool.type !== "date");
 
 // Fields the sender may leave optional. A signature, initials, the date and
 // the name are always needed.
@@ -921,7 +929,7 @@ function PrepareLiveShellContent({
             <section className="panel space-y-3 rounded-[1.25rem] p-4">
               <p className="section-eyebrow px-1">Fields</p>
               <div className="grid gap-2">
-                {fieldTools.map((tool) => (
+                {paletteTools.map((tool) => (
                   <FieldToolButton
                     isActive={armedTool === tool.type}
                     key={tool.type}
@@ -1433,7 +1441,7 @@ function MobileFieldToolsSheet({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <div className="grid gap-2 sm:grid-cols-2">
-            {fieldTools.map((tool) => (
+            {paletteTools.map((tool) => (
               <FieldToolButton
                 isActive={armedTool === tool.type}
                 key={`mobile-${tool.type}`}
@@ -1471,7 +1479,18 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
       >
         <Icon className="size-4" strokeWidth={2.2} />
       </span>
-      <span className="flex-1">{tool.label}</span>
+      <span className="flex-1">
+        {tool.label}
+        {tool.hint ? (
+          <span
+            className={`block text-xs font-semibold ${
+              isActive ? "text-white/85" : "text-(--tertiary)"
+            }`}
+          >
+            {tool.hint}
+          </span>
+        ) : null}
+      </span>
       <span
         className={`pr-1.5 text-xs font-semibold ${
           isActive ? "text-white/85" : "text-(--tertiary)"

@@ -88,11 +88,11 @@ test("on a short phone the Field tools sheet keeps Done in view, and Escape clos
   await expect(
     sheet.getByRole("button", { exact: true, name: "Signature" }),
   ).toHaveAttribute("aria-pressed", "true");
-  await sheet.getByRole("button", { exact: true, name: "Date" }).click();
+  await sheet.getByRole("button", { exact: true, name: "Name" }).click();
   await expect(sheet).toBeHidden();
   await openTools.click();
   await expect(
-    sheet.getByRole("button", { exact: true, name: "Date" }),
+    sheet.getByRole("button", { exact: true, name: "Name" }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(
     sheet.getByRole("button", { exact: true, name: "Signature" }),

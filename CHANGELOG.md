@@ -10,6 +10,10 @@ release says when it does.
 
 ### Changed
 
+- The field tools no longer offer a separate Date field: a Signature field
+  carries the date and time. Date fields already placed in a draft, a
+  template or by the API keep working.
+
 - Under a signature goes the day and time on the signer's own clock, such as
   "11/22/26 10:07:14 PM", with no time zone. It was the date alone.
 - On a computer, the signing controls float at the bottom of the screen as a
