@@ -35,6 +35,7 @@ type ShellSection =
   | "contacts"
   | "documents"
   | "new-envelope"
+  | "preview"
   | "settings"
   | "templates"
   | "workspace";
@@ -222,6 +223,10 @@ function resolveSection(pathname: string): ShellSection {
 
   if (pathname === "/contacts") {
     return "contacts";
+  }
+
+  if (pathname === "/preview") {
+    return "preview";
   }
 
   return "workspace";

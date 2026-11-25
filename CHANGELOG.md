@@ -28,6 +28,14 @@ release says when it does.
 
 ### Added
 
+- A Preview tab in the top menu shows what clients see when they sign, on a
+  sample document, on a computer or a phone. A sender places fields on the
+  sample with the same editor as for a real document (the fields are kept),
+  types in who is signing, who it is from and what it is called, and signs it
+  to see the whole thing, from the agreement screen to the finished page.
+  Nothing is saved to a real document, recorded as a signature or sent. This
+  needs a migration, which adds a table for each sender's sample layout.
+
 - A Contacts page keeps the names and emails of people a sender sends to
   often. On the signers step, each signer and copy recipient has a Contacts
   button that fills in their name and email, and a tick, on by default, saves
