@@ -70,9 +70,22 @@ import { getSignerPalette } from "./signer-palette";
 
 type PrepareFieldType = FieldPlacement["type"];
 
+/**
+ * Set for the Preview tab's sample document: where the fields are saved and
+ * where the buttons lead, in place of a real envelope's.
+ */
+export type PrepareLivePreview = {
+  backHref: string;
+  backLabel: string;
+  fieldsUrl: string;
+  nextHref: string;
+  stepLabel: string;
+};
+
 type PrepareLiveShellProps = {
   envelopeId: string;
   initialState?: "error";
+  preview?: PrepareLivePreview;
   record?: PrepareEnvelopeData;
 };
 
@@ -400,13 +413,20 @@ async function parseJsonResponse<T>(
 export function PrepareLiveShell({
   envelopeId,
   initialState,
+  preview,
   record,
 }: PrepareLiveShellProps) {
   if (initialState === "error" || !record) {
     return <PrepareLiveShellError envelopeId={envelopeId} />;
   }
 
-  return <PrepareLiveShellContent envelopeId={envelopeId} record={record} />;
+  return (
+    <PrepareLiveShellContent
+      envelopeId={envelopeId}
+      preview={preview}
+      record={record}
+    />
+  );
 }
 
 function PrepareLiveShellError({ envelopeId }: { envelopeId: string }) {
@@ -445,9 +465,11 @@ function PrepareLiveShellError({ envelopeId }: { envelopeId: string }) {
 
 function PrepareLiveShellContent({
   envelopeId,
+  preview,
   record,
 }: {
   envelopeId: string;
+  preview?: PrepareLivePreview;
   record: PrepareEnvelopeData;
 }) {
   const signers = buildLiveSigners(record.signers);
@@ -493,7 +515,8 @@ function PrepareLiveShellContent({
 
   currentFieldsRef.current = fields;
 
-  const backHref = `/envelopes/${envelopeId}/signers`;
+  const backHref = preview?.backHref ?? `/envelopes/${envelopeId}/signers`;
+  const fieldsUrl = preview?.fieldsUrl ?? `/api/envelopes/${envelopeId}/fields`;
 
   const pageCount = record.pages.length;
   const pageFields = fields.filter((field) => field.page === activePage);
@@ -608,7 +631,7 @@ function PrepareLiveShellContent({
       // saves again, instead of having its next save refused.
       saveChainRef.current = saveChainRef.current.then(async () => {
         try {
-          const response = await fetch(`/api/envelopes/${envelopeId}/fields`, {
+          const response = await fetch(fieldsUrl, {
             body: JSON.stringify({
               ...buildFieldRequest(unsaved),
               expectedRevision: fieldsRevisionRef.current,
@@ -649,7 +672,7 @@ function PrepareLiveShellContent({
       // A link inside the app (the header, say) unmounts it instead.
       flushUnsavedFields();
     };
-  }, [envelopeId]);
+  }, [envelopeId, fieldsUrl]);
 
   useEffect(() => {
     if (!selectedFieldId) {
@@ -719,7 +742,7 @@ function PrepareLiveShellContent({
     setSaveError(null);
     setSaveState("saving");
 
-    const response = await fetch(`/api/envelopes/${envelopeId}/fields`, {
+    const response = await fetch(fieldsUrl, {
       body: JSON.stringify({
         ...buildFieldRequest(nextFields),
         expectedRevision: fieldsRevisionRef.current,
@@ -810,7 +833,7 @@ function PrepareLiveShellContent({
 
     try {
       const currentSignature = serializeFieldRequest(fields);
-      let redirectPath = `/envelopes/${envelopeId}/review`;
+      let redirectPath = preview?.nextHref ?? `/envelopes/${envelopeId}/review`;
 
       if (currentSignature !== lastSavedSignatureRef.current) {
         const saveResult = await persistFields(fields);
@@ -914,13 +937,13 @@ function PrepareLiveShellContent({
   return (
     <CanvasShell
       backHref={backHref}
-      backLabel="Back"
+      backLabel={preview?.backLabel ?? "Back"}
       nextDisabled={!canContinue}
-      nextLabel="Next →"
+      nextLabel={preview ? "Preview signing →" : "Next →"}
       nextLoading={isContinuing}
       onBack={(event) => void handleBack(event)}
       onNext={handleContinue}
-      stepLabel="Step 3 of 4"
+      stepLabel={preview?.stepLabel ?? "Step 3 of 4"}
       title={`"${record.title}"`}
     >
       <div className="grid min-h-[calc(100dvh-73px)] lg:grid-cols-[272px_minmax(0,1fr)_304px]">

@@ -9,6 +9,7 @@ export const primaryNavItems: ShellNavItem[] = [
   { href: "/dashboard", label: "Documents" },
   { href: "/templates", label: "Templates" },
   { href: "/contacts", label: "Contacts" },
+  { href: "/preview", label: "Preview" },
   { href: "/envelopes/new", label: "New envelope" },
   { href: "/settings", label: "Settings" },
 ];

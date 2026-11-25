@@ -1,17 +1,23 @@
 import { Brand } from "@/components/layout/brand";
 import { PublicLegalFooter } from "@/components/layout/public-legal-links";
+import { ShellButton } from "@/components/shared/form-shell";
 
 import { SigningDoneToast } from "./signing-done-toast";
 
 const fallbackEnvelopeTitle = "this document";
 
 type SigningDoneShellProps = {
+  /** Set for the Preview tab: a button back to it, in place of closing the tab. */
+  backHref?: string;
+  backLabel?: string;
   /** Shown inside another app's page, which carries on from here. */
   embedded?: boolean;
   envelopeTitle?: string | null;
 };
 
 export function SigningDoneShell({
+  backHref,
+  backLabel = "Back",
   embedded = false,
   envelopeTitle,
 }: SigningDoneShellProps) {
@@ -67,7 +73,11 @@ export function SigningDoneShell({
             You&apos;ll receive an email with the signed document once all
             parties have signed.
           </p>
-          {embedded ? null : (
+          {backHref ? (
+            <div className="mt-8 flex justify-center">
+              <ShellButton href={backHref}>{backLabel}</ShellButton>
+            </div>
+          ) : embedded ? null : (
             <p className="mt-8 inline-flex rounded-full bg-(--surface) px-4 py-2 text-sm font-semibold text-(--secondary)">
               You can close this tab.
             </p>

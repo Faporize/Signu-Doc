@@ -62,7 +62,7 @@ export function SigningActionBar({
     <>
       {/* On a computer the count of what is left sits at the top right. */}
       {remaining > 0 ? (
-        <p className="pointer-events-none fixed right-5 top-[5.25rem] z-30 hidden items-center gap-2 rounded-lg border border-(--border-strong) bg-white/95 px-3 py-1.5 text-[0.8125rem] font-semibold text-(--secondary) shadow-sm md:flex">
+        <p className="pointer-events-none fixed right-5 top-[6.5rem] z-30 hidden items-center gap-2 rounded-lg border border-(--border-strong) bg-white/95 px-3 py-1.5 text-[0.8125rem] font-semibold text-(--secondary) shadow-sm md:flex">
           To go
           <span className="inline-flex min-w-6 justify-center rounded-md bg-(--accent) px-1.5 py-0.5 text-xs font-bold text-white">
             {remaining}
