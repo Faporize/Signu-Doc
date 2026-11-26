@@ -120,6 +120,7 @@ export function DashboardDocumentsHeader({
   return (
     <>
       <PageHeader
+        inlineAction
         action={
           interactive ? (
             <ShellButton href="/envelopes/new">{label}</ShellButton>
