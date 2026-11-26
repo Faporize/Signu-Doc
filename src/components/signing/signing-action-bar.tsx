@@ -131,7 +131,7 @@ export function SigningActionBar({
             ) : null}
           </div>
 
-          <div className="flex items-stretch gap-2">
+          <div className="flex items-stretch gap-2 md:order-3">
             {isStarted ? (
               <ShellButton
                 className="min-h-12 w-12 shrink-0 px-0"
