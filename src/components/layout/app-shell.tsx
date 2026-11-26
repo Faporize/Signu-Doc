@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type ComponentProps, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 
 import { Brand } from "@/components/layout/brand";
 import {
@@ -49,6 +54,14 @@ export function AppShell({
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const currentSection = resolveSection(pathname);
+
+  // On a phone the menu scrolls sideways: bring the current page into view.
+  useEffect(() => {
+    document
+      .querySelector('nav[aria-label="Workspace"] [aria-current="page"]')
+      ?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [pathname]);
+
   const initials = getInitials(user.name, { max: 2 }) || "SU";
 
   async function handleSignOut() {
@@ -135,7 +148,7 @@ export function AppShell({
 
           <nav
             aria-label="Workspace"
-            className="-mx-1 flex w-full items-center gap-1 overflow-x-auto px-1 pb-1 md:hidden"
+            className="-mx-1 flex w-full items-center gap-1 overflow-x-auto px-1 pb-1 [mask-image:linear-gradient(to_right,black_calc(100%-1.75rem),transparent)] [scrollbar-width:none] md:hidden"
           >
             {primaryNavItems.map((item) => (
               <AppNavLink

@@ -40,17 +40,21 @@ export default async function PreviewSignPage({
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-(--accent) px-4 py-2 text-[0.8125rem] font-semibold text-white">
+      <div
+        aria-label="Preview notice"
+        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-(--accent) px-4 py-2 text-[0.8125rem] font-semibold text-white"
+        role="region"
+      >
         <p>Preview: nothing here is saved or sent.</p>
         <p className="flex gap-4">
           <Link
-            className="underline underline-offset-2"
+            className="inline-flex min-h-8 items-center underline underline-offset-2"
             href={`/preview/edit?${query}`}
           >
             Edit fields
           </Link>
           <Link
-            className="underline underline-offset-2"
+            className="inline-flex min-h-8 items-center underline underline-offset-2"
             href={`/preview?${query}`}
           >
             Settings

@@ -89,12 +89,16 @@
   --shadow-card: 0 2px 6px rgba(28, 29, 43, 0.04);
   --shadow-lift: 0 10px 30px rgba(28, 29, 43, 0.08);
   --signer-1: #2563eb;
+  --signer-1-ink: #2056cc;
   --signer-1-tint: rgba(37, 99, 235, 0.12);
   --signer-2: #9333ea;
+  --signer-2-ink: #832dd0;
   --signer-2-tint: rgba(147, 51, 234, 0.12);
   --signer-3: #b45309;
+  --signer-3-ink: #9d4808;
   --signer-3-tint: rgba(217, 119, 6, 0.14);
   --signer-4: #047857;
+  --signer-4-ink: #046e50;
   --signer-4-tint: rgba(5, 150, 105, 0.12);
   --radius: 0.75rem;
 }
@@ -481,6 +485,16 @@ html {
   text-size-adjust: 100%;
   /* No pull-to-refresh or rubber-band while drawing or dragging on the page. */
   overscroll-behavior-y: none;
+}
+
+/* A focused element must not sit under fixed chrome: the sticky header on
+   the editor pages, and the signing controls at the bottom of a signing page. */
+html:has([data-sticky-header]) {
+  scroll-padding-top: 5.5rem;
+}
+
+html:has([aria-label="Signing controls"]) {
+  scroll-padding-bottom: 12rem;
 }
 
 /* Touch behavior of controls. These live in the base layer so a utility on an

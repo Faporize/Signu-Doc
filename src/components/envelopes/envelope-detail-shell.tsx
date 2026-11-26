@@ -35,7 +35,7 @@ import {
   ENVELOPE_DEADLINE_DAY_OPTIONS,
   ENVELOPE_REMINDER_DAY_OPTIONS,
 } from "@/lib/types/domain";
-import { getSignerPalette } from "./signer-palette";
+import { getSignerPalette, signerInk } from "./signer-palette";
 
 /** A finished envelope an administrator has scheduled to be deleted. */
 export type EnvelopeDeletionNotice = {
@@ -553,7 +553,7 @@ export function EnvelopeDetailShell({
     <div className="space-y-5">
       <section className="panel p-5 sm:p-8" data-animate="enter">
         <Link
-          className="inline-flex items-center text-sm font-semibold text-(--secondary) transition hover:text-(--accent-ink)"
+          className="inline-flex min-h-8 items-center text-sm font-semibold text-(--secondary) transition hover:text-(--accent-ink)"
           href={isOwnEnvelope ? "/dashboard" : "/dashboard?view=all"}
         >
           {isOwnEnvelope ? "← Documents" : "← All envelopes"}
@@ -887,7 +887,11 @@ export function EnvelopeDetailShell({
             {activeRecord.signers.map((signer, index) => {
               const palette =
                 signer.color && signer.tint
-                  ? { color: signer.color, tint: signer.tint }
+                  ? {
+                      color: signer.color,
+                      ink: signerInk(signer.color),
+                      tint: signer.tint,
+                    }
                   : getSignerPalette(index);
               const StatusIcon = signerStatusIcons[signer.status];
 
@@ -899,7 +903,7 @@ export function EnvelopeDetailShell({
                       className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
                       style={{
                         backgroundColor: palette.tint,
-                        color: palette.color,
+                        color: palette.ink,
                       }}
                     >
                       {signsAtTheSameTime ? stepOf(signer) : signer.order}

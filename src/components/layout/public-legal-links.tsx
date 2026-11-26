@@ -30,7 +30,7 @@ export function PublicLegalFooter({
   const branding = useBranding();
   const resolvedLinkClassName =
     linkClassName ??
-    "text-[0.8125rem] font-medium text-(--tertiary) transition-colors hover:text-(--accent-ink)";
+    "inline-flex min-h-8 items-center text-[0.8125rem] font-medium text-(--tertiary) transition-colors hover:text-(--accent-ink)";
   // The hosted service links to its own pages. Any other install links to
   // whatever terms and privacy policy its organization has published.
   const links: FooterLink[] = branding.hosted

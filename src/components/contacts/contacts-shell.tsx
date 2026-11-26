@@ -242,7 +242,7 @@ export function ContactsShell({
           }}
         >
           <DialogContent
-            className="max-h-[calc(100vh-4rem)] max-w-md overflow-y-auto sm:p-8"
+            className="max-h-[calc(100dvh-4rem)] max-w-md overflow-y-auto overscroll-contain sm:p-8"
             showCloseButton={false}
           >
             <form className="space-y-4" onSubmit={(event) => void save(event)}>

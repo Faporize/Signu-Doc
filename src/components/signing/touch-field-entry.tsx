@@ -127,7 +127,7 @@ export function TouchFieldEntry({
 
       <Dialog onOpenChange={setOpen} open={open}>
         <DialogContent
-          className="max-h-[calc(100dvh-2rem)] max-w-[600px] overflow-y-auto"
+          className="max-h-[calc(100dvh-2rem)] max-w-[600px] overflow-y-auto overscroll-contain"
           showCloseButton={false}
         >
           <form

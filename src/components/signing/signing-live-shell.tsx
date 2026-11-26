@@ -1055,7 +1055,7 @@ export function SigningLiveShell({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col pb-32 md:pb-28">
       <header className="sticky top-0 z-20 bg-[rgba(243,244,248,0.88)] backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex min-w-0 items-center gap-5">
@@ -1093,7 +1093,7 @@ export function SigningLiveShell({
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col gap-4 pb-44 pt-1 sm:px-6">
+      <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col gap-4 pb-8 pt-1 sm:px-6">
         <h1 className="sr-only">{`Sign ${record.envelopeTitle}`}</h1>
         {signatureProblem && providerSignature ? (
           <div className="notice notice-danger" role="alert">
@@ -1419,7 +1419,7 @@ export function SigningLiveShell({
         >
           <div
             aria-label="Electronic records and signatures disclosure"
-            className="well max-h-[45vh] space-y-4 overflow-y-auto px-4 py-4 text-sm leading-6 text-(--secondary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) sm:px-5"
+            className="well max-h-[45dvh] space-y-4 overflow-y-auto overscroll-contain px-4 py-4 text-sm leading-6 text-(--secondary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) sm:px-5"
             role="region"
             tabIndex={0}
           >
@@ -1751,7 +1751,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
+        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)] ${
           tooLongMessage
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
@@ -1804,7 +1804,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
+        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)] ${
           isInvalid
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
@@ -1856,7 +1856,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:bg-white"
+        className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)]"
         // Room for the arrow on the right and the left padding of the select.
         options={{ paddingX: 14 }}
         style={frame}
@@ -2449,7 +2449,7 @@ function DialogFrame({
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="max-h-[calc(100dvh-2rem)] max-w-[600px] overflow-y-auto p-0"
+        className="max-h-[calc(100dvh-2rem)] max-w-[600px] overflow-y-auto overscroll-contain p-0"
         onCloseAutoFocus={(event) => {
           if (
             returnFocusTarget instanceof HTMLElement &&

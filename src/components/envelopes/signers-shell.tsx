@@ -458,7 +458,7 @@ function SignerCard({
               className="pill"
               style={{
                 backgroundColor: palette.tint,
-                color: palette.color,
+                color: palette.ink,
               }}
             >
               <span

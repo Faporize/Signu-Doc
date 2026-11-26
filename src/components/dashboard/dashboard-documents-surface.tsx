@@ -120,6 +120,7 @@ export function DashboardDocumentsHeader({
   return (
     <>
       <PageHeader
+        inlineAction
         action={
           interactive ? (
             <ShellButton href="/envelopes/new">{label}</ShellButton>
@@ -179,7 +180,7 @@ export function DashboardDocumentsPanel({
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div
           aria-label="Filter documents"
-          className="segmented self-start"
+          className="segmented max-w-full flex-nowrap self-start overflow-x-auto whitespace-nowrap [scrollbar-width:none]"
           role="group"
         >
           {filterOptions.map((filter) => {
@@ -315,7 +316,7 @@ function ErrorBanner({ interactive, onRetry }: ErrorBannerProps) {
 
 function EnvelopeGrid({ envelopes, interactive }: EnvelopeGridProps) {
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4">
+    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] sm:gap-4">
       {envelopes.map((envelope) => (
         <li className="min-w-0" key={envelope.id}>
           <EnvelopeCard envelope={envelope} interactive={interactive} />
@@ -337,7 +338,7 @@ function EnvelopeCard({
 }) {
   const content = (
     <>
-      <span className="flex h-52 items-center justify-center rounded-2xl bg-(--surface) p-3.5 transition group-hover:bg-[#f0f0f6]">
+      <span className="row-span-2 flex h-28 w-20 items-center justify-center rounded-xl bg-(--surface) p-1.5 transition group-hover:bg-[#f0f0f6] sm:h-52 sm:w-auto sm:rounded-2xl sm:p-3.5">
         {interactive ? (
           <DocumentThumbnail envelopeId={envelope.id} title={envelope.title} />
         ) : (
@@ -389,7 +390,7 @@ function EnvelopeCard({
     </>
   );
   const className =
-    "group panel flex h-full flex-col gap-3.5 rounded-[1.25rem] p-3.5";
+    "group panel grid h-full grid-cols-[5rem_minmax(0,1fr)] content-center gap-x-3 gap-y-1 rounded-[1.25rem] p-3 sm:flex sm:flex-col sm:gap-3.5 sm:p-3.5";
 
   if (!interactive) {
     return <div className={className}>{content}</div>;
