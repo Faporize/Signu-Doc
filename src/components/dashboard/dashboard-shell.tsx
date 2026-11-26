@@ -152,8 +152,9 @@ function EmptyDashboardState() {
         <ShellButton href="/envelopes/new">
           <PlusIcon
             aria-hidden="true"
+            absoluteStrokeWidth
             className="size-[1.125rem]"
-            strokeWidth={2.4}
+            strokeWidth={2.5}
           />
           New envelope
         </ShellButton>

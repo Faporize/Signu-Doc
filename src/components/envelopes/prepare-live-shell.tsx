@@ -1501,7 +1501,7 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
           isActive ? "bg-white/20 text-white" : "bg-white text-(--accent)"
         }`}
       >
-        <Icon className="size-4" strokeWidth={2.2} />
+        <Icon absoluteStrokeWidth className="size-4" strokeWidth={2.5} />
       </span>
       <span className="flex-1">
         {tool.label}

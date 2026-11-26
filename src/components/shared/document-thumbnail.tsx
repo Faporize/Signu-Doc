@@ -105,7 +105,7 @@ export function DocumentThumbnail({
   }
 
   const frameClassName = cn(
-    "block h-full w-auto max-w-full rounded-[0.5rem] bg-white object-contain shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] ring-1 ring-[rgba(28,29,43,0.06)]",
+    "block h-full w-auto max-w-full rounded-[0.5rem] bg-white object-contain shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] outline outline-1 -outline-offset-1 outline-black/10",
     className,
   );
 
@@ -180,7 +180,7 @@ function PagePlaceholder({
     <span
       aria-hidden="true"
       className={cn(
-        "flex aspect-[17/22] h-full flex-col gap-[7%] rounded-[0.5rem] bg-white px-[12%] py-[14%] shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] ring-1 ring-[rgba(28,29,43,0.06)]",
+        "flex aspect-[17/22] h-full flex-col gap-[7%] rounded-[0.5rem] bg-white px-[12%] py-[14%] shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] outline outline-1 -outline-offset-1 outline-black/10",
         className,
       )}
     >
@@ -355,7 +355,7 @@ export function SampleDocumentPage({
     <svg
       aria-hidden="true"
       className={cn(
-        "block h-full w-auto max-w-full rounded-[0.5rem] bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] ring-1 ring-[rgba(28,29,43,0.06)]",
+        "block h-full w-auto max-w-full rounded-[0.5rem] bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_6px_16px_rgba(28,29,43,0.10)] outline outline-1 -outline-offset-1 outline-black/10",
         className,
       )}
       viewBox={`0 0 ${String(SAMPLE_PAGE_WIDTH)} ${String(SAMPLE_PAGE_HEIGHT)}`}

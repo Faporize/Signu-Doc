@@ -196,8 +196,9 @@ function UploadShellLayout({
                   <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-(--accent-soft) text-(--accent)">
                     <UploadIcon
                       aria-hidden="true"
+                      absoluteStrokeWidth
                       className="size-5"
-                      strokeWidth={2.2}
+                      strokeWidth={2.5}
                     />
                   </span>
                   <div className="space-y-1.5">

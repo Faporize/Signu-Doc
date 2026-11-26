@@ -624,8 +624,9 @@ export function EnvelopeDetailShell({
               <ShellButton href={documentUrl} inNewTab variant="secondary">
                 <FileTextIcon
                   aria-hidden="true"
+                  absoluteStrokeWidth
                   className="size-[1.125rem]"
-                  strokeWidth={2.2}
+                  strokeWidth={2.5}
                 />
                 View document
               </ShellButton>
@@ -674,8 +675,9 @@ export function EnvelopeDetailShell({
                 <ShellButton onClick={() => handleDownload("signed")}>
                   <DownloadIcon
                     aria-hidden="true"
+                    absoluteStrokeWidth
                     className="size-[1.125rem]"
-                    strokeWidth={2.2}
+                    strokeWidth={2.5}
                   />
                   Download signed PDF
                 </ShellButton>
