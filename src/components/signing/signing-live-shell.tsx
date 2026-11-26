@@ -1751,7 +1751,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
+        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)] ${
           tooLongMessage
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
@@ -1804,7 +1804,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:bg-white ${
+        className={`absolute z-2 overflow-hidden rounded-[0.375rem] border-2 focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)] ${
           isInvalid
             ? "border-(--danger) bg-(--danger-soft)"
             : "border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)]"
@@ -1856,7 +1856,7 @@ function CurrentSignerField({
 
     return (
       <FitBox
-        className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:bg-white"
+        className="absolute z-2 overflow-hidden rounded-[0.375rem] border-2 border-(--accent) bg-[rgb(var(--accent-rgb)/0.07)] focus-within:z-3 focus-within:bg-white focus-within:shadow-[0_0_0_3px_#fff,0_0_0_6px_var(--accent)]"
         // Room for the arrow on the right and the left padding of the select.
         options={{ paddingX: 14 }}
         style={frame}

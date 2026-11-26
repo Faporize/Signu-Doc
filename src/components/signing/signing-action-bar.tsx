@@ -72,10 +72,10 @@ export function SigningActionBar({
 
       <div
         aria-label="Signing controls"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2 md:rounded-2xl md:border-0 md:bg-[#2f3640] md:p-2 md:text-white md:shadow-[0_12px_40px_rgba(15,23,42,0.35)]"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2 md:rounded-2xl md:border-0 md:bg-[#2f3640] md:p-2 md:text-white md:shadow-[0_12px_40px_rgba(15,23,42,0.35)]"
         role="region"
       >
-        <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-3 md:max-w-none md:flex-row md:items-center md:gap-3 md:p-0">
+        <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-2.5 md:max-w-none md:flex-row md:items-center md:gap-3 md:p-0">
           {alerts.length > 0 ? (
             <div className="grid gap-1 md:basis-full" role="alert">
               {alerts.map((alert) => (
@@ -89,40 +89,43 @@ export function SigningActionBar({
             </div>
           ) : null}
 
-          {pages ? (
-            <div className="flex items-center justify-center gap-2">
-              <button
-                aria-label="Previous page"
-                className="btn-quiet size-9 px-0 pointer-coarse:size-11 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
-                disabled={pages.active === 1}
-                onClick={pages.onPrevious}
-                type="button"
+          <div className="flex items-center justify-between gap-3 md:contents">
+            {hasSteps || remaining > 0 ? (
+              <p
+                aria-live="polite"
+                className="min-w-0 flex-1 text-left text-[0.8125rem] font-semibold leading-5 text-(--secondary) md:order-2 md:max-w-72 md:flex-none md:text-white/80"
               >
-                <ChevronLeftIcon className="size-4" />
-              </button>
-              <p className="min-w-[6.5rem] text-center text-[0.8125rem] font-bold text-(--secondary) md:min-w-0 md:text-white/80">
-                {`Page ${pages.active} of ${pages.count}`}
+                {caption}
               </p>
-              <button
-                aria-label="Next page"
-                className="btn-quiet size-9 px-0 pointer-coarse:size-11 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
-                disabled={pages.active === pages.count}
-                onClick={pages.onNext}
-                type="button"
-              >
-                <ChevronRightIcon className="size-4" />
-              </button>
-            </div>
-          ) : null}
+            ) : null}
 
-          {hasSteps || remaining > 0 ? (
-            <p
-              aria-live="polite"
-              className="text-center text-[0.8125rem] font-semibold text-(--secondary) md:max-w-72 md:text-left md:text-white/80"
-            >
-              {caption}
-            </p>
-          ) : null}
+            {pages ? (
+              <div className="flex shrink-0 items-center gap-1.5 md:order-1 md:gap-2">
+                <button
+                  aria-label="Previous page"
+                  className="btn-quiet size-9 px-0 pointer-coarse:size-10 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
+                  disabled={pages.active === 1}
+                  onClick={pages.onPrevious}
+                  type="button"
+                >
+                  <ChevronLeftIcon className="size-4" />
+                </button>
+                <p className="min-w-8 text-center text-[0.8125rem] font-bold text-(--secondary) md:min-w-0 md:text-white/80">
+                  <span className="md:hidden">{`${pages.active}/${pages.count}`}</span>
+                  <span className="hidden md:inline">{`Page ${pages.active} of ${pages.count}`}</span>
+                </p>
+                <button
+                  aria-label="Next page"
+                  className="btn-quiet size-9 px-0 pointer-coarse:size-10 md:bg-white/10! md:text-white! md:hover:bg-white/20!"
+                  disabled={pages.active === pages.count}
+                  onClick={pages.onNext}
+                  type="button"
+                >
+                  <ChevronRightIcon className="size-4" />
+                </button>
+              </div>
+            ) : null}
+          </div>
 
           <div className="flex items-stretch gap-2">
             {isStarted ? (
