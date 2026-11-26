@@ -62,7 +62,7 @@ export function ContactPicker({
 
       <Dialog onOpenChange={setOpen} open={open}>
         <DialogContent
-          className="max-h-[calc(100dvh-2rem)] max-w-md overflow-y-auto sm:p-8"
+          className="max-h-[calc(100dvh-2rem)] max-w-md overflow-y-auto overscroll-contain sm:p-8"
           showCloseButton={false}
         >
           <div className="space-y-4">
@@ -82,7 +82,7 @@ export function ContactPicker({
             {shown.length === 0 ? (
               <p className="text-sm text-(--secondary)">No contacts match.</p>
             ) : (
-              <ul className="max-h-[50dvh] space-y-2 overflow-y-auto">
+              <ul className="max-h-[50dvh] space-y-2 overflow-y-auto overscroll-contain">
                 {shown.map((contact) => (
                   <li key={contact.id}>
                     <button

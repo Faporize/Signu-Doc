@@ -24,7 +24,7 @@ import {
   ENVELOPE_DEADLINE_DAY_OPTIONS,
   ENVELOPE_REMINDER_DAY_OPTIONS,
 } from "@/lib/types/domain";
-import { getSignerPalette } from "./signer-palette";
+import { getSignerPalette, signerInk } from "./signer-palette";
 
 const envelopeSteps = ["Upload", "Signers", "Place fields", "Review"];
 const redirectDelayMs = 1200;
@@ -313,7 +313,11 @@ export function ReviewShell({
               {activeRecord.signers.map((signer, index) => {
                 const palette =
                   signer.color && signer.tint
-                    ? { color: signer.color, tint: signer.tint }
+                    ? {
+                        color: signer.color,
+                        ink: signerInk(signer.color),
+                        tint: signer.tint,
+                      }
                     : getSignerPalette(index);
 
                 return (
@@ -323,7 +327,7 @@ export function ReviewShell({
                         className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
                         style={{
                           backgroundColor: palette.tint,
-                          color: palette.color,
+                          color: palette.ink,
                         }}
                       >
                         {signsAtTheSameTime ? stepOf(signer) : signer.order}
@@ -343,7 +347,7 @@ export function ReviewShell({
                             className="pill w-fit"
                             style={{
                               backgroundColor: palette.tint,
-                              color: palette.color,
+                              color: palette.ink,
                             }}
                           >
                             <span

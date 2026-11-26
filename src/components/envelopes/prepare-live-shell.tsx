@@ -110,6 +110,7 @@ type LiveFieldSource = Array<{
 
 type PrepareShellSigner = {
   color: string;
+  ink: string;
   email: string;
   id: string;
   name: string;
@@ -947,7 +948,7 @@ function PrepareLiveShellContent({
       title={`"${record.title}"`}
     >
       <div className="grid min-h-[calc(100dvh-73px)] lg:grid-cols-[272px_minmax(0,1fr)_304px]">
-        <aside className="hidden lg:block">
+        <aside aria-label="Field tools" className="hidden lg:block">
           <div className="sticky top-[4.5rem] flex max-h-[calc(100dvh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pl-5">
             <section className="panel space-y-3 rounded-[1.25rem] p-4">
               <p className="section-eyebrow px-1">Fields</p>
@@ -1282,7 +1283,7 @@ function PrepareLiveShellContent({
           </div>
         </section>
 
-        <aside className="hidden lg:block">
+        <aside aria-label="Inspector" className="hidden lg:block">
           <div className="sticky top-[4.5rem] flex max-h-[calc(100dvh-4.5rem)] flex-col gap-4 overflow-y-auto py-5 pr-5">
             <section className="panel space-y-3 rounded-[1.25rem] p-4">
               <p className="section-eyebrow px-1">Inspector</p>
@@ -1548,7 +1549,7 @@ function SignerCard({
           className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[0.8125rem] font-bold"
           style={{
             backgroundColor: signer.tint,
-            color: signer.color,
+            color: signer.ink,
           }}
         >
           {getInitials(signer.name, { max: 4 })}
@@ -1615,7 +1616,7 @@ function SelectedSignerPanel({
           className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
           style={{
             backgroundColor: selectedSigner.tint,
-            color: selectedSigner.color,
+            color: selectedSigner.ink,
           }}
         >
           {getInitials(selectedSigner.name, { max: 4 })}

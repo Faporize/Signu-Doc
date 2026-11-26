@@ -496,7 +496,7 @@ function LiveLoginShell({
           <div className="flex flex-col gap-3 border-t border-(--border) pt-5 text-sm text-(--secondary)">
             {showPasswordForm ? (
               <button
-                className="w-fit p-0 text-left font-bold text-(--accent-ink) underline-offset-4 hover:underline"
+                className="min-h-8 w-fit p-0 text-left font-bold text-(--accent-ink) underline-offset-4 hover:underline"
                 onClick={openForgotPasswordModal}
                 type="button"
               >
@@ -867,7 +867,7 @@ function SecondStepCard({ onRestart, onSignedIn }: SecondStepCardProps) {
 
         <div className="border-t border-(--border) pt-5 text-sm">
           <button
-            className="w-fit p-0 text-left font-bold text-(--accent-ink) underline-offset-4 hover:underline"
+            className="min-h-8 w-fit p-0 text-left font-bold text-(--accent-ink) underline-offset-4 hover:underline"
             onClick={() => {
               setUseBackupCode((current) => !current);
               setCode("");
