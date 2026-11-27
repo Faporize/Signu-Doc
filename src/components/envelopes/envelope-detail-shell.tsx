@@ -584,7 +584,7 @@ export function EnvelopeDetailShell({
             )}
             <div className="min-w-0 space-y-2.5">
               <h1
-                className={`text-[clamp(1.5rem,3vw,1.875rem)] font-extrabold leading-tight tracking-[-0.03em] wrap-break-word ${
+                className={`text-[clamp(1.5rem,3vw,1.875rem)] font-display font-semibold leading-tight tracking-[-0.02em] wrap-break-word ${
                   activeRecord.status === "voided"
                     ? "text-(--tertiary)"
                     : "text-(--fg)"

@@ -59,7 +59,7 @@ export function SigningDoneShell({
             </svg>
           </div>
 
-          <h1 className="mt-7 text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold tracking-[-0.035em] text-(--fg)">
+          <h1 className="mt-7 text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold tracking-[-0.02em] text-(--fg)">
             You&apos;re all done.
           </h1>
           <p className="mx-auto mt-4 max-w-[480px] text-base leading-7 text-(--secondary)">

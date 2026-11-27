@@ -445,7 +445,7 @@ function PrepareLiveShellError({ envelopeId }: { envelopeId: string }) {
           <div className="mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-(--danger-soft) text-lg font-extrabold text-(--danger)">
             !
           </div>
-          <h1 className="mt-5 text-2xl font-extrabold tracking-[-0.03em] text-(--fg)">
+          <h1 className="mt-5 text-2xl font-display font-semibold tracking-[-0.02em] text-(--fg)">
             Couldn&apos;t load this document
           </h1>
           <p className="mt-2 text-sm leading-6 text-(--secondary)">

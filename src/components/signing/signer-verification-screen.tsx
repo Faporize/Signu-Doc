@@ -184,7 +184,7 @@ export function SignerVerificationScreen({
           >
             <ShieldCheckIcon className="size-6" strokeWidth={2.2} />
           </span>
-          <h1 className="mt-6 text-[clamp(1.625rem,4vw,2rem)] font-extrabold leading-tight tracking-[-0.03em] text-(--fg)">
+          <h1 className="mt-6 text-[clamp(1.625rem,4vw,2rem)] font-display font-semibold leading-tight tracking-[-0.02em] text-(--fg)">
             Confirm it&apos;s you
           </h1>
           <p className="mt-3 text-base leading-7 text-(--secondary)">

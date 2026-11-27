@@ -27,7 +27,7 @@ export function PageHeader({
       className="panel grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 px-4 py-4 sm:gap-x-6 sm:px-8 sm:py-7"
       data-animate="enter"
     >
-      <h1 className="col-start-1 row-start-1 min-w-0 text-[clamp(1.625rem,3vw,2rem)] font-extrabold leading-[1.15] tracking-[-0.03em] text-(--fg)">
+      <h1 className="col-start-1 row-start-1 min-w-0 text-[clamp(1.625rem,3vw,2rem)] font-display font-semibold leading-[1.15] tracking-[-0.02em] text-(--fg)">
         {title}
       </h1>
       {description ? (

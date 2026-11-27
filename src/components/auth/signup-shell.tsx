@@ -124,7 +124,7 @@ function SignupFormCard({
       <div className="space-y-7">
         <div className="space-y-2">
           <p className="section-eyebrow">Create account</p>
-          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
             Create your account
           </h1>
           {signupRule ? (
@@ -274,7 +274,7 @@ function SignupClosedCard() {
       <div className="space-y-7">
         <div className="space-y-2">
           <p className="section-eyebrow">Create account</p>
-          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
             Sign-up is closed
           </h1>
           <p className="pt-1 text-sm leading-6 text-muted-foreground">

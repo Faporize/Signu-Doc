@@ -15,7 +15,7 @@ type EmailButtonInput = {
  * Email programs ignore most CSS, so the button is a table cell with its own
  * background color and an inline-styled link. It uses the install's accent
  * color (the palette darkens it until white text on it is readable), or the
- * default violet when the install has not chosen one.
+ * default blue when the install has not chosen one.
  */
 export function buildEmailButton({
   branding,

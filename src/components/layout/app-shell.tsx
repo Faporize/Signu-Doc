@@ -86,7 +86,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 bg-[rgba(243,244,248,0.86)] backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-[rgba(251,250,248,0.86)] backdrop-blur-md">
         <div className="page-width flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3 sm:py-4">
           <div className="flex min-w-0 items-center gap-7">
             <Brand href="/" />

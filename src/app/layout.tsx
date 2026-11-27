@@ -1,15 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+// The same three faces as apprvl.io: Inter for text, Fraunces for headlines
+// and JetBrains Mono for the small uppercase labels.
+const inter = Inter({
   display: "swap",
   subsets: ["latin"],
   variable: "--font-ui",
-  weight: ["400", "500", "600", "700", "800"],
+});
+
+const fraunces = Fraunces({
+  display: "swap",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-mono-label",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +42,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   interactiveWidget: "resizes-content",
-  themeColor: "#f3f4f8",
+  themeColor: "#fbfaf8",
 };
 
 export default function RootLayout({
@@ -38,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.variable} antialiased`}>
+      <body className={`${inter.variable} ${fraunces.variable} ${jetBrainsMono.variable} antialiased`}>
         <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>

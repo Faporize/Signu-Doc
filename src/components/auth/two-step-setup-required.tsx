@@ -28,7 +28,7 @@ export function TwoStepSetupRequired({ email }: { email: string }) {
     <div className="w-full max-w-[720px] space-y-5">
       <section className="panel space-y-3 p-8 sm:p-10">
         <p className="section-eyebrow">One more step</p>
-        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
           Set up two-step sign-in
         </h1>
         <p className="text-sm leading-6 text-(--secondary)">

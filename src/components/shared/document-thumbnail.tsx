@@ -186,13 +186,13 @@ function PagePlaceholder({
     >
       <span
         className={cn(
-          "h-[4%] w-3/5 rounded-full bg-[#cfd0dc]",
+          "h-[4%] w-3/5 rounded-full bg-[#d4d0c8]",
           layout.centered && "self-center",
         )}
       />
       {layout.lines.map((width, index) => (
         <span
-          className={cn("h-[3%] rounded-full bg-[#e3e4ec]", width)}
+          className={cn("h-[3%] rounded-full bg-[#e8e5df]", width)}
           key={index}
         />
       ))}

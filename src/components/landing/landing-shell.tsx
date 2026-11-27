@@ -134,7 +134,7 @@ const sectionLeadClassName =
 export function LandingShell() {
   return (
     <div className="flex min-h-dvh flex-col text-(--fg)">
-      <header className="sticky top-0 z-30 bg-[rgba(243,244,248,0.86)] backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-[rgba(251,250,248,0.86)] backdrop-blur-md">
         <div className="page-width flex items-center justify-between gap-3 py-3 sm:py-4">
           <Brand href="/" />
 
@@ -173,9 +173,9 @@ export function LandingShell() {
           >
             <SectionMarker>Free e-signature software</SectionMarker>
 
-            <h1 className="mx-auto max-w-[18ch] text-[clamp(2.375rem,6vw,4.25rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-(--fg)">
+            <h1 className="mx-auto max-w-[18ch] text-[clamp(2.375rem,6vw,4.25rem)] font-display font-semibold leading-[1.04] tracking-[-0.02em] text-(--fg)">
               Sign PDFs Online for Free.{" "}
-              <span className="text-(--accent)">No catch.</span>
+              <span className="font-normal text-(--accent) italic">No catch.</span>
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-(--secondary) sm:text-[1.1875rem]">
