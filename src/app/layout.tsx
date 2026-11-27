@@ -52,7 +52,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${fraunces.variable} ${jetBrainsMono.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${fraunces.variable} ${jetBrainsMono.variable} antialiased`}
+      >
         <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>

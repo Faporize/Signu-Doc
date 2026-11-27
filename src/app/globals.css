@@ -6,7 +6,8 @@
 
 @theme inline {
   --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
-  --font-mono: var(--font-mono-label), ui-monospace, "SFMono-Regular", monospace;
+  --font-mono:
+    var(--font-mono-label), ui-monospace, "SFMono-Regular", monospace;
   --color-background: var(--page);
   --color-foreground: var(--fg);
   --color-card: var(--paper);
@@ -126,8 +127,7 @@
     min-height: 100dvh;
     background: var(--page);
     color: var(--fg);
-    font-family:
-      var(--font-ui), Inter, ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-ui), Inter, ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.005em;
     text-rendering: optimizeLegibility;
   }

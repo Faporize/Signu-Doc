@@ -175,7 +175,9 @@ export function LandingShell() {
 
             <h1 className="mx-auto max-w-[18ch] text-[clamp(2.375rem,6vw,4.25rem)] font-display font-semibold leading-[1.04] tracking-[-0.02em] text-(--fg)">
               Sign PDFs Online for Free.{" "}
-              <span className="font-normal text-(--accent) italic">No catch.</span>
+              <span className="font-normal text-(--accent) italic">
+                No catch.
+              </span>
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-(--secondary) sm:text-[1.1875rem]">
