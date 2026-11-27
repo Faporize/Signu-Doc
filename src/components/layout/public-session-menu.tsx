@@ -15,6 +15,7 @@ import {
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/cn";
 import { getInitials } from "@/lib/initials";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 type PublicSessionMenuProps = {
   align?: "center" | "end" | "start";
@@ -33,7 +34,12 @@ export function PublicSessionMenu({
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   if (!session) {
-    return <>{children}</>;
+    return (
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        {children}
+      </div>
+    );
   }
 
   const initials = getInitials(session.user.name, {
@@ -56,50 +62,53 @@ export function PublicSessionMenu({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          aria-label="Open account menu"
-          className={cn(
-            "inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ffd9c2] text-[0.8125rem] font-bold text-[#7a3412] transition hover:ring-4 hover:ring-[rgba(28,29,43,0.06)]",
-            buttonClassName,
-          )}
-          type="button"
+    <div className="flex items-center gap-2">
+      <ThemeToggle />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            aria-label="Open account menu"
+            className={cn(
+              "inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ffd9c2] text-[0.8125rem] font-bold text-[#7a3412] transition hover:ring-4 hover:ring-[rgba(28,29,43,0.06)]",
+              buttonClassName,
+            )}
+            type="button"
+          >
+            {initials ? initials : <CircleUserRound className="size-4" />}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align={align}
+          className={cn("w-60", contentClassName)}
         >
-          {initials ? initials : <CircleUserRound className="size-4" />}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align={align}
-        className={cn("w-60", contentClassName)}
-      >
-        <DropdownMenuLabel className="px-3 py-2">
-          <p className="truncate text-sm font-bold text-(--fg)">
-            {session.user.name}
-          </p>
-          <p className="mt-0.5 truncate text-xs font-normal text-(--tertiary)">
-            {session.user.email}
-          </p>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard" prefetch>
-            <LayoutDashboard className="size-4" />
-            Dashboard
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={isSigningOut}
-          onSelect={(event) => {
-            event.preventDefault();
-            void handleSignOut();
-          }}
-          variant="destructive"
-        >
-          <LogOut className="size-4" />
-          {isSigningOut ? "Signing out..." : "Log out"}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuLabel className="px-3 py-2">
+            <p className="truncate text-sm font-bold text-(--fg)">
+              {session.user.name}
+            </p>
+            <p className="mt-0.5 truncate text-xs font-normal text-(--tertiary)">
+              {session.user.email}
+            </p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard" prefetch>
+              <LayoutDashboard className="size-4" />
+              Dashboard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={isSigningOut}
+            onSelect={(event) => {
+              event.preventDefault();
+              void handleSignOut();
+            }}
+            variant="destructive"
+          >
+            <LogOut className="size-4" />
+            {isSigningOut ? "Signing out..." : "Log out"}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

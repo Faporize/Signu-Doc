@@ -408,7 +408,7 @@ function LiveLoginShell({
         <div className="space-y-7">
           <div className="space-y-2">
             <p className="section-eyebrow">Log in</p>
-            <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+            <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
               Welcome back
             </h1>
           </div>
@@ -687,7 +687,7 @@ function ResetPasswordCard({ resetToken }: { resetToken: string }) {
       <div className="space-y-8">
         <div className="space-y-2">
           <p className="section-eyebrow">Reset password</p>
-          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
             Create a new password
           </h1>
         </div>
@@ -826,7 +826,7 @@ function SecondStepCard({ onRestart, onSignedIn }: SecondStepCardProps) {
       <div className="space-y-7">
         <div className="space-y-2">
           <p className="section-eyebrow">Two-step sign-in</p>
-          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+          <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
             {useBackupCode ? "Enter a backup code" : "Enter your code"}
           </h1>
           <p className="text-sm leading-6 text-(--secondary)">

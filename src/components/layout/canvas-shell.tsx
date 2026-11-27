@@ -38,7 +38,7 @@ export function CanvasShell({
     <div className="min-h-dvh bg-(--page)">
       <header
         data-sticky-header
-        className="sticky top-0 z-20 bg-[rgba(255,255,255,0.92)] shadow-[0_1px_0_rgba(28,29,43,0.06)] backdrop-blur-md"
+        className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--paper)_92%,transparent)] shadow-[0_1px_0_rgba(28,29,43,0.06)] backdrop-blur-md"
       >
         <div className="flex min-h-[4.5rem] items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link

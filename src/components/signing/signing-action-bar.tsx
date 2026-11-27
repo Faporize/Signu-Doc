@@ -64,11 +64,11 @@ export function SigningActionBar({
       {remaining > 0 ? (
         <div
           aria-label="Required fields left"
-          className="pointer-events-none fixed right-5 top-[6.5rem] z-30 hidden items-center gap-2 rounded-lg border border-(--border-strong) bg-white/95 px-3 py-1.5 text-[0.8125rem] font-semibold text-(--secondary) shadow-sm md:flex"
+          className="pointer-events-none fixed right-5 top-[6.5rem] z-30 hidden items-center gap-2 rounded-lg border border-(--border-strong) bg-(--paper)/95 px-3 py-1.5 text-[0.8125rem] font-semibold text-(--secondary) shadow-sm md:flex"
           role="region"
         >
           To go
-          <span className="inline-flex min-w-6 justify-center rounded-md bg-(--accent) px-1.5 py-0.5 text-xs font-bold text-white">
+          <span className="inline-flex min-w-6 justify-center rounded-md bg-(--accent) px-1.5 py-0.5 text-xs font-bold text-(--on-accent)">
             {remaining}
           </span>
         </div>
@@ -76,7 +76,7 @@ export function SigningActionBar({
 
       <div
         aria-label="Signing controls"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[rgba(255,255,255,0.94)] pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2 md:rounded-2xl md:border-0 md:bg-[#2f3640] md:p-2 md:text-white md:shadow-[0_12px_40px_rgba(15,23,42,0.35)]"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-(--border-strong) bg-[color-mix(in_srgb,var(--paper)_94%,transparent)] pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2 md:rounded-2xl md:border-0 md:bg-[#2f3640] md:p-2 md:text-white md:shadow-[0_12px_40px_rgba(15,23,42,0.35)]"
         role="region"
       >
         <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-2.5 md:max-w-none md:flex-row md:items-center md:gap-3 md:p-0">

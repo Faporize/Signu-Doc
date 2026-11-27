@@ -34,7 +34,7 @@ export function NotFoundShell({
         <p className="text-[4.5rem] font-extrabold leading-none tracking-[-0.05em] text-(--accent)">
           404
         </p>
-        <h1 className="mt-4 text-[clamp(1.875rem,5vw,2.5rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+        <h1 className="mt-4 text-[clamp(1.875rem,5vw,2.5rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
           Page not found
         </h1>
         <p className="mx-auto mt-3 max-w-md text-base leading-7 text-(--secondary)">

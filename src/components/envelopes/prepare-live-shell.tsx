@@ -445,7 +445,7 @@ function PrepareLiveShellError({ envelopeId }: { envelopeId: string }) {
           <div className="mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-(--danger-soft) text-lg font-extrabold text-(--danger)">
             !
           </div>
-          <h1 className="mt-5 text-2xl font-extrabold tracking-[-0.03em] text-(--fg)">
+          <h1 className="mt-5 text-2xl font-display font-semibold tracking-[-0.02em] text-(--fg)">
             Couldn&apos;t load this document
           </h1>
           <p className="mt-2 text-sm leading-6 text-(--secondary)">
@@ -1137,7 +1137,7 @@ function PrepareLiveShellContent({
                 className={`mx-auto ${zoomLevel > DEFAULT_DOCUMENT_ZOOM_LEVEL ? "w-full" : "flex justify-center"}`}
               >
                 <div
-                  className="relative overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)]"
+                  className="doc-light relative overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)]"
                   style={{
                     width: `${zoomLevel * 100}%`,
                   }}
@@ -1188,7 +1188,7 @@ function PrepareLiveShellContent({
 
                     {fields.length === 0 ? (
                       <div className="absolute inset-0 z-1 flex items-center justify-center px-6">
-                        <div className="max-w-[300px] rounded-[1.25rem] border-2 border-dashed border-(--border-strong) bg-white/92 px-6 py-7 text-center">
+                        <div className="max-w-[300px] rounded-[1.25rem] border-2 border-dashed border-(--border-strong) bg-(--paper)/92 px-6 py-7 text-center">
                           <p className="text-lg font-extrabold tracking-[-0.02em] text-(--fg)">
                             No fields placed yet
                           </p>
@@ -1240,7 +1240,7 @@ function PrepareLiveShellContent({
                     })}
 
                     {armedTool ? (
-                      <div className="pointer-events-none absolute inset-x-4 bottom-4 z-11 rounded-2xl bg-white/95 px-4 py-3 shadow-(--shadow-lift) ring-1 ring-[rgb(var(--accent-rgb)/0.18)] sm:inset-x-6 sm:bottom-6">
+                      <div className="pointer-events-none absolute inset-x-4 bottom-4 z-11 rounded-2xl bg-(--paper)/95 px-4 py-3 shadow-(--shadow-lift) ring-1 ring-[rgb(var(--accent-rgb)/0.18)] sm:inset-x-6 sm:bottom-6">
                         <p className="text-[0.8125rem] font-bold text-(--accent-ink)">
                           Ready to place
                         </p>
@@ -1445,7 +1445,7 @@ function MobileFieldToolsSheet({
       <div
         aria-label="Field tools"
         aria-modal="true"
-        className="absolute inset-x-0 bottom-0 flex max-h-[calc(100dvh-1rem)] flex-col rounded-t-[1.75rem] bg-white pt-5 shadow-[0_-24px_60px_rgba(28,29,43,0.18)]"
+        className="absolute inset-x-0 bottom-0 flex max-h-[calc(100dvh-1rem)] flex-col rounded-t-[1.75rem] bg-(--paper) pt-5 shadow-[0_-24px_60px_rgba(28,29,43,0.18)]"
         ref={sheetRef}
         role="dialog"
       >
@@ -1489,7 +1489,7 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
       aria-pressed={isActive}
       className={`flex min-h-12 items-center gap-3 rounded-[0.875rem] px-2.5 text-left text-sm font-bold transition ${
         isActive
-          ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+          ? "bg-(--accent) text-(--on-accent) shadow-(--shadow-sm)"
           : "bg-(--surface) text-(--fg) hover:bg-(--accent-softer) hover:text-(--accent-ink)"
       }`}
       onClick={onSelect}
@@ -1498,7 +1498,9 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
       <span
         aria-hidden="true"
         className={`inline-flex size-8 shrink-0 items-center justify-center rounded-[0.625rem] ${
-          isActive ? "bg-white/20 text-white" : "bg-white text-(--accent)"
+          isActive
+            ? "bg-white/20 text-(--on-accent)"
+            : "bg-(--paper) text-(--accent)"
         }`}
       >
         <Icon absoluteStrokeWidth className="size-4" strokeWidth={2.5} />
@@ -1508,7 +1510,7 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
         {tool.hint ? (
           <span
             className={`block text-xs font-semibold ${
-              isActive ? "text-white/85" : "text-(--tertiary)"
+              isActive ? "text-(--on-accent)/85" : "text-(--tertiary)"
             }`}
           >
             {tool.hint}
@@ -1517,7 +1519,7 @@ function FieldToolButton({ isActive, onSelect, tool }: FieldToolButtonProps) {
       </span>
       <span
         className={`pr-1.5 text-xs font-semibold ${
-          isActive ? "text-white/85" : "text-(--tertiary)"
+          isActive ? "text-(--on-accent)/85" : "text-(--tertiary)"
         }`}
       >
         {isActive ? "Placing" : "Place"}
@@ -1660,7 +1662,7 @@ function SaveStatusIndicator({
         aria-hidden="true"
         className={`inline-flex size-5 items-center justify-center rounded-full ${
           isError
-            ? "bg-white text-(--danger)"
+            ? "bg-(--paper) text-(--danger)"
             : isSaving
               ? "text-(--secondary)"
               : "bg-(--success-soft) text-(--success)"

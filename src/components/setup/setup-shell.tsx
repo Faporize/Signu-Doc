@@ -217,7 +217,7 @@ function SetupNotice({
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
           {title}
         </h1>
       </div>
@@ -408,7 +408,7 @@ function SetupForm({
   return (
     <div className="space-y-7">
       <div className="space-y-2">
-        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-extrabold leading-[1.08] tracking-[-0.035em] text-(--fg)">
+        <h1 className="text-[clamp(1.875rem,4.5vw,2.375rem)] font-display font-semibold leading-[1.08] tracking-[-0.02em] text-(--fg)">
           {isCreate ? "Set up your site" : "Choose an administrator"}
         </h1>
         <p className="pt-1 text-sm leading-6 text-muted-foreground">

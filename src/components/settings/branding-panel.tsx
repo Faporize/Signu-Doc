@@ -225,7 +225,7 @@ export function BrandingPanel({
             className="flex flex-wrap items-center gap-3 rounded-xl bg-(--paper) px-4 py-3"
             style={brandPaletteVariables(palette) as CSSProperties}
           >
-            <span className="inline-flex min-h-9 items-center rounded-[0.75rem] bg-(--accent) px-3.5 text-[0.8125rem] font-bold text-white">
+            <span className="inline-flex min-h-9 items-center rounded-[0.75rem] bg-(--accent) px-3.5 text-[0.8125rem] font-bold text-(--on-accent)">
               Button
             </span>
             <span className="pill pill-accent">Status</span>

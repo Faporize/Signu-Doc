@@ -83,7 +83,7 @@ function PublicDocumentPage({
                   Last updated {lastUpdated}
                 </p>
               ) : null}
-              <h1 className="max-w-[20ch] text-[clamp(2rem,4.5vw,3rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-(--fg)">
+              <h1 className="max-w-[20ch] text-[clamp(2rem,4.5vw,3rem)] font-display font-semibold leading-[1.06] tracking-[-0.02em] text-(--fg)">
                 {title}
               </h1>
               <p className="mt-4 max-w-[680px] text-base leading-7 text-(--secondary) sm:text-[1.0625rem]">

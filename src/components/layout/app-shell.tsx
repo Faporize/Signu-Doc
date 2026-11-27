@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -86,7 +87,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 bg-[rgba(243,244,248,0.86)] backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--page)_86%,transparent)] backdrop-blur-md">
         <div className="page-width flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3 sm:py-4">
           <div className="flex min-w-0 items-center gap-7">
             <Brand href="/" />
@@ -104,47 +105,50 @@ export function AppShell({
             </nav>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                aria-label={`Account menu for ${user.name}`}
-                className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ffd9c2] text-[0.8125rem] font-bold text-[#7a3412] transition hover:ring-4 hover:ring-[rgba(28,29,43,0.06)]"
-                type="button"
-              >
-                {initials}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel className="px-3 py-2">
-                <p className="truncate text-sm font-bold text-(--fg)">
-                  {user.name}
-                </p>
-                <p className="mt-0.5 truncate text-xs font-normal text-(--tertiary)">
-                  {user.email}
-                </p>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={isSigningOut}
-                onSelect={(
-                  event: ComponentProps<
-                    typeof DropdownMenuItem
-                  >["onSelect"] extends ((event: infer T) => void) | undefined
-                    ? T
-                    : never,
-                ) => {
-                  event.preventDefault();
-                  void handleSignOut();
-                }}
-                variant="destructive"
-              >
-                {isSigningOut ? "Signing out..." : "Sign out"}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  aria-label={`Account menu for ${user.name}`}
+                  className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ffd9c2] text-[0.8125rem] font-bold text-[#7a3412] transition hover:ring-4 hover:ring-[rgba(28,29,43,0.06)]"
+                  type="button"
+                >
+                  {initials}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="px-3 py-2">
+                  <p className="truncate text-sm font-bold text-(--fg)">
+                    {user.name}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs font-normal text-(--tertiary)">
+                    {user.email}
+                  </p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={isSigningOut}
+                  onSelect={(
+                    event: ComponentProps<
+                      typeof DropdownMenuItem
+                    >["onSelect"] extends ((event: infer T) => void) | undefined
+                      ? T
+                      : never,
+                  ) => {
+                    event.preventDefault();
+                    void handleSignOut();
+                  }}
+                  variant="destructive"
+                >
+                  {isSigningOut ? "Signing out..." : "Sign out"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <nav
             aria-label="Workspace"
@@ -203,8 +207,8 @@ function AppNavLink({
       className={cn(
         "inline-flex min-h-9 shrink-0 items-center rounded-[0.625rem] px-3.5 text-sm transition",
         isActive
-          ? "bg-white font-bold text-(--fg) shadow-(--shadow-xs)"
-          : "font-semibold text-(--secondary) hover:bg-[rgba(255,255,255,0.6)] hover:text-(--fg)",
+          ? "bg-(--paper) font-bold text-(--fg) shadow-(--shadow-xs)"
+          : "font-semibold text-(--secondary) hover:bg-[color-mix(in_srgb,var(--paper)_60%,transparent)] hover:text-(--fg)",
       )}
       href={item.href}
     >

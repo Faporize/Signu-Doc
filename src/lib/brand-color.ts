@@ -12,7 +12,7 @@ export type BrandPalette = {
   accentHover: string;
   /** Text in the brand color, readable on white and on the pale tints. */
   accentInk: string;
-  /** "83 64 214", for shades with transparency. */
+  /** "47 93 150", for shades with transparency. */
   accentRgb: string;
   accentSoft: string;
   accentSoftHover: string;
@@ -20,16 +20,16 @@ export type BrandPalette = {
 };
 
 /** The accent the design ships with. Keep in step with globals.css. */
-export const DEFAULT_BRAND_COLOR = "#5340d6";
+export const DEFAULT_BRAND_COLOR = "#2f5d96";
 
 export const DEFAULT_BRAND_PALETTE: BrandPalette = {
   accent: DEFAULT_BRAND_COLOR,
-  accentHover: "#4433b8",
-  accentInk: "#4433b8",
-  accentRgb: "83 64 214",
-  accentSoft: "#ece9fd",
-  accentSoftHover: "#e0dbfb",
-  accentSofter: "#f4f2ff",
+  accentHover: "#274e7e",
+  accentInk: "#274e7e",
+  accentRgb: "47 93 150",
+  accentSoft: "#e6eef8",
+  accentSoftHover: "#d8e4f3",
+  accentSofter: "#f1f6fb",
 };
 
 type Rgb = [red: number, green: number, blue: number];
