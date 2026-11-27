@@ -110,8 +110,9 @@ export function DashboardDocumentsHeader({
     <>
       <PlusIcon
         aria-hidden="true"
+        absoluteStrokeWidth
         className="size-[1.125rem]"
-        strokeWidth={2.4}
+        strokeWidth={2.5}
       />
       New envelope
     </>
@@ -338,7 +339,7 @@ function EnvelopeCard({
 }) {
   const content = (
     <>
-      <span className="row-span-2 flex h-28 w-20 items-center justify-center rounded-xl bg-(--surface) p-1.5 transition group-hover:bg-[#f0f0f6] sm:h-52 sm:w-auto sm:rounded-2xl sm:p-3.5">
+      <span className="row-span-2 flex h-28 w-20 items-center justify-center rounded-xl bg-(--surface) p-1.5 transition group-hover:bg-[#f0f0f6] sm:h-52 sm:w-auto sm:p-3.5">
         {interactive ? (
           <DocumentThumbnail envelopeId={envelope.id} title={envelope.title} />
         ) : (
@@ -390,7 +391,7 @@ function EnvelopeCard({
     </>
   );
   const className =
-    "group panel grid h-full grid-cols-[5rem_minmax(0,1fr)] content-center gap-x-3 gap-y-1 rounded-[1.25rem] p-3 sm:flex sm:flex-col sm:gap-3.5 sm:p-3.5";
+    "group panel grid h-full grid-cols-[5rem_minmax(0,1fr)] content-center gap-x-3 gap-y-1 rounded-[1.5rem] p-3 sm:flex sm:flex-col sm:gap-3.5 sm:p-3";
 
   if (!interactive) {
     return <div className={className}>{content}</div>;
@@ -414,7 +415,12 @@ function UploadCard({ interactive }: { interactive: boolean }) {
   const content = (
     <>
       <span className="inline-flex size-11 items-center justify-center rounded-[0.875rem] bg-(--accent-soft) text-(--accent)">
-        <PlusIcon aria-hidden="true" className="size-5" strokeWidth={2.4} />
+        <PlusIcon
+          absoluteStrokeWidth
+          aria-hidden="true"
+          className="size-5"
+          strokeWidth={2.5}
+        />
       </span>
       Upload a PDF
     </>
