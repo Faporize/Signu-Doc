@@ -134,7 +134,7 @@ const sectionLeadClassName =
 export function LandingShell() {
   return (
     <div className="flex min-h-dvh flex-col text-(--fg)">
-      <header className="sticky top-0 z-30 bg-[rgba(251,250,248,0.86)] backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-[color-mix(in_srgb,var(--page)_86%,transparent)] backdrop-blur-md">
         <div className="page-width flex items-center justify-between gap-3 py-3 sm:py-4">
           <Brand href="/" />
 

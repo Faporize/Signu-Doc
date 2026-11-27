@@ -177,7 +177,7 @@ function UploadShellLayout({
                 <>
                   <div
                     aria-label="Upload progress"
-                    className="h-2 w-full max-w-sm overflow-hidden rounded-full bg-white"
+                    className="h-2 w-full max-w-sm overflow-hidden rounded-full bg-(--paper)"
                     role="progressbar"
                   >
                     <div className="h-full w-2/3 animate-pulse rounded-full bg-(--accent)" />
@@ -243,7 +243,7 @@ function UploadShellLayout({
                     src={previewUrl}
                   />
                 ) : (
-                  <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white text-(--accent)">
+                  <span className="inline-flex size-11 items-center justify-center rounded-xl bg-(--paper) text-(--accent)">
                     <FileTextIcon aria-hidden="true" className="size-5" />
                   </span>
                 )}

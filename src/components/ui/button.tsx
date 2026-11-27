@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-white [color:#fff] hover:bg-[var(--accent-hover)] hover:text-white hover:[color:#fff]",
+          "bg-primary text-(--on-accent) hover:bg-[var(--accent-hover)] hover:text-(--on-accent)",
         outline:
           "border-[var(--border-strong)] bg-[var(--paper)] text-card-foreground hover:border-[var(--secondary)] hover:bg-[var(--surface)]",
         secondary:
@@ -53,7 +53,7 @@ function Button({
   }) {
   const Comp = asChild ? Slot.Root : "button";
   const resolvedStyle =
-    variant === "default" || variant === "destructive"
+    variant === "destructive"
       ? {
           ...style,
           color: "#fff",

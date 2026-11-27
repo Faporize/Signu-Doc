@@ -42,8 +42,15 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   interactiveWidget: "resizes-content",
-  themeColor: "#fbfaf8",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf8" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1f23" },
+  ],
 };
+
+// Runs before the first paint so a saved or system dark theme never flashes
+// light. A saved choice wins, then the system setting.
+const themeScript = `try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -51,7 +58,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`${inter.variable} ${fraunces.variable} ${jetBrainsMono.variable} antialiased`}
       >

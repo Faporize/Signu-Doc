@@ -78,7 +78,7 @@ export function LandingDashboardPreview() {
                   className={cn(
                     "inline-flex min-h-9 items-center rounded-[0.625rem] px-3.5 text-sm",
                     item.href === "/dashboard"
-                      ? "bg-white font-bold text-(--fg) shadow-(--shadow-xs)"
+                      ? "bg-(--paper) font-bold text-(--fg) shadow-(--shadow-xs)"
                       : "font-semibold text-(--secondary)",
                   )}
                   key={item.href}

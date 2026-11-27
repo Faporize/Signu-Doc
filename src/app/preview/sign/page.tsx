@@ -42,7 +42,7 @@ export default async function PreviewSignPage({
     <>
       <div
         aria-label="Preview notice"
-        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-(--accent) px-4 py-2 text-[0.8125rem] font-semibold text-white"
+        className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-(--accent) px-4 py-2 text-[0.8125rem] font-semibold text-(--on-accent)"
         role="region"
       >
         <p>Preview: nothing here is saved or sent.</p>

@@ -219,7 +219,7 @@ export function DashboardDocumentsPanel({
           {view === "all" ? (
             <input name="view" type="hidden" value="all" />
           ) : null}
-          <label className="flex min-h-[2.625rem] w-full items-center gap-2.5 rounded-xl bg-white px-3.5 text-(--tertiary) transition focus-within:ring-3 focus-within:ring-ring/50">
+          <label className="flex min-h-[2.625rem] w-full items-center gap-2.5 rounded-xl bg-(--paper) px-3.5 text-(--tertiary) transition focus-within:ring-3 focus-within:ring-ring/50">
             <SearchIcon aria-hidden="true" className="size-4 shrink-0" />
             <input
               aria-label="Search by title or email..."
@@ -339,7 +339,7 @@ function EnvelopeCard({
 }) {
   const content = (
     <>
-      <span className="row-span-2 flex h-28 w-20 items-center justify-center rounded-xl bg-(--surface) p-1.5 transition group-hover:bg-[#f0f0f6] sm:h-52 sm:w-auto sm:p-3.5">
+      <span className="row-span-2 flex h-28 w-20 items-center justify-center rounded-xl bg-(--surface) p-1.5 transition group-hover:bg-(--surface-strong) sm:h-52 sm:w-auto sm:p-3.5">
         {interactive ? (
           <DocumentThumbnail envelopeId={envelope.id} title={envelope.title} />
         ) : (

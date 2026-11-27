@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "../styles/shadcn-tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 @theme inline {
   --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
@@ -15,7 +15,7 @@
   --color-popover: var(--paper-raised);
   --color-popover-foreground: var(--fg);
   --color-primary: var(--accent);
-  --color-primary-foreground: #ffffff;
+  --color-primary-foreground: var(--on-accent);
   --color-secondary: var(--surface);
   --color-secondary-foreground: var(--fg);
   --color-muted: var(--surface);
@@ -72,6 +72,7 @@
   --accent-soft-hover: #d8e4f3;
   --accent-softer: #f1f6fb;
   --accent-ink: #274e7e;
+  --on-accent: #ffffff;
   --danger: #b42318;
   --danger-hover: #912018;
   --danger-soft: #fdebea;
@@ -104,6 +105,93 @@
   --signer-4-ink: #046e50;
   --signer-4-tint: rgba(5, 150, 105, 0.12);
   --radius: 0.75rem;
+}
+
+/*
+ * The dark theme, from apprvl.io's own dark palette. The page and the cards
+ * follow the site; the accent turns the site's sky blue with dark text on it.
+ * The document itself stays white in both themes.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #1f1f23;
+  --bg: #1f1f23;
+  --paper: #2c2c32;
+  --paper-raised: #323238;
+  --fg: #f5f6f8;
+  --secondary: #c6c7cd;
+  --tertiary: #a4a5ad;
+  --placeholder: #9a9ba3;
+  --accent: #79c2e8;
+  --accent-rgb: 121 194 232;
+  --accent-hover: #66b5e0;
+  --accent-soft: rgba(121, 194, 232, 0.16);
+  --accent-soft-hover: rgba(121, 194, 232, 0.24);
+  --accent-softer: rgba(121, 194, 232, 0.1);
+  --accent-ink: #9fd3f0;
+  --on-accent: #13293f;
+  --danger: #ff8f86;
+  --danger-hover: #ffa8a1;
+  --danger-soft: rgba(255, 143, 134, 0.16);
+  --success: #6fd3a2;
+  --success-soft: rgba(111, 211, 162, 0.16);
+  --warning: #f0bd62;
+  --warning-soft: rgba(240, 189, 98, 0.16);
+  --surface: #26262b;
+  --surface-strong: #3a3a41;
+  --shell-surface: #2c2c32;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --border-hover: rgba(255, 255, 255, 0.34);
+  --hover: rgba(255, 255, 255, 0.07);
+  --shell-wash: #1f1f23;
+  --canvas-wash: #18181b;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --signer-1-ink: #7fa9f5;
+  --signer-2-ink: #c39bf2;
+  --signer-3-ink: #f0a45c;
+  --signer-4-ink: #5fd0a4;
+}
+
+/*
+ * A sheet of the document keeps the light colors in the dark theme, because
+ * the paper the fields sit on stays white.
+ */
+:root[data-theme="dark"] .doc-light {
+  color-scheme: light;
+  --paper: #ffffff;
+  --fg: #1d1d1f;
+  --secondary: #55565c;
+  --tertiary: #696a70;
+  --placeholder: #6f7076;
+  --accent: #2f5d96;
+  --accent-rgb: 47 93 150;
+  --accent-hover: #274e7e;
+  --accent-soft: #e6eef8;
+  --accent-ink: #274e7e;
+  --on-accent: #ffffff;
+  --danger: #b42318;
+  --danger-soft: #fdebea;
+  --surface: #f3f1ed;
+  --surface-strong: #ebe8e2;
+  --border: #e8e5df;
+  --border-strong: #d4d0c8;
+  --hover: rgba(29, 29, 31, 0.05);
+  --signer-1-ink: #2056cc;
+  --signer-2-ink: #832dd0;
+  --signer-3-ink: #9d4808;
+  --signer-4-ink: #046e50;
+}
+
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c6c7cd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"] .pill-neutral {
+  background: #3a3a41;
 }
 
 /*

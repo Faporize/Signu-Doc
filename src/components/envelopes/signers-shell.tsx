@@ -588,7 +588,7 @@ function SignerCard({
         </div>
 
         {part11Mode ? (
-          <label className="grid gap-2 rounded-2xl bg-white p-4 text-sm text-(--fg) sm:p-5">
+          <label className="grid gap-2 rounded-2xl bg-(--paper) p-4 text-sm text-(--fg) sm:p-5">
             <span className="font-bold text-(--fg)">
               What this signature means
             </span>
@@ -629,7 +629,7 @@ function SignerCard({
           </label>
         ) : null}
 
-        <fieldset className="grid gap-3 rounded-2xl bg-white p-4 text-sm text-(--fg) sm:p-5">
+        <fieldset className="grid gap-3 rounded-2xl bg-(--paper) p-4 text-sm text-(--fg) sm:p-5">
           <legend className="sr-only">Extra check before signing</legend>
           <p className="font-bold text-(--fg)">
             Extra check before signing{" "}

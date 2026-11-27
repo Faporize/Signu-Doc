@@ -29,7 +29,7 @@ export function StepIndicator({ current, steps }: StepIndicatorProps) {
               <span
                 className={`inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                   isCurrent
-                    ? "bg-(--accent) text-white"
+                    ? "bg-(--accent) text-(--on-accent)"
                     : isComplete
                       ? "bg-(--accent-soft) text-(--accent-ink)"
                       : "bg-(--surface-strong) text-(--secondary)"

@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { DownloadIcon } from "lucide-react";
 import Image from "next/image";
 import {
@@ -1056,7 +1057,7 @@ export function SigningLiveShell({
 
   return (
     <div className="flex min-h-dvh flex-col pb-32 md:pb-28">
-      <header className="sticky top-0 z-20 bg-[rgba(251,250,248,0.88)] backdrop-blur-md">
+      <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--page)_88%,transparent)] backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex min-w-0 items-center gap-5">
             <Brand href="/" />
@@ -1070,6 +1071,7 @@ export function SigningLiveShell({
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle className="hidden size-11! sm:inline-flex" />
             <a
               className="btn-quiet min-h-11 px-3 sm:px-4"
               download="document.pdf"
@@ -1105,7 +1107,7 @@ export function SigningLiveShell({
         ) : null}
         <div className="panel mx-auto w-full max-w-[920px] overflow-hidden rounded-none border-x-0 sm:rounded-[1.25rem] sm:border-x">
           <div className="relative overflow-auto p-0 sm:p-6" data-paper-grid>
-            <div className="relative w-full overflow-hidden bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)] sm:rounded-md">
+            <div className="doc-light relative w-full overflow-hidden bg-white shadow-[0_1px_2px_rgba(28,29,43,0.08),0_12px_32px_rgba(28,29,43,0.12)] sm:rounded-md">
               <div
                 className="relative overflow-hidden"
                 data-field-viewport
@@ -2130,14 +2132,14 @@ function SignatureModal({
       >
         <TabsList className="segmented flex h-auto w-full p-1 group-data-horizontal/tabs:h-auto">
           <TabsTrigger
-            className="segmented-item h-auto min-h-10 flex-1 data-active:bg-white data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
+            className="segmented-item h-auto min-h-10 flex-1 data-active:bg-(--paper) data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
             aria-controls={undefined}
             value="typed"
           >
             Type
           </TabsTrigger>
           <TabsTrigger
-            className="segmented-item h-auto min-h-10 flex-1 data-active:bg-white data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
+            className="segmented-item h-auto min-h-10 flex-1 data-active:bg-(--paper) data-active:text-(--fg) data-active:shadow-[0_1px_3px_rgba(28,29,43,0.12)] after:hidden"
             aria-controls={undefined}
             value="drawn"
           >
@@ -2406,7 +2408,7 @@ function SignatureDrawCanvas({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-(--border-strong) bg-white">
+    <div className="doc-light relative overflow-hidden rounded-xl border-2 border-dashed border-(--border-strong) bg-white">
       <canvas
         aria-label="Draw signature canvas"
         className="h-[220px] w-full touch-none"
